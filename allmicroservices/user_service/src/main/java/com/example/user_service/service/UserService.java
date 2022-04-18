@@ -4,10 +4,8 @@ import com.example.user_service.exception.UserMedicineException;
 import com.example.user_service.exception.UserexceptionMessage;
 import com.example.user_service.model.UserEntity;
 import com.example.user_service.pojos.dto.UserEntityDTO;
-import com.itextpdf.text.DocumentException;
 
 import javax.mail.MessagingException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -28,7 +26,7 @@ public interface UserService {
 
     public UserEntity getUserByEmail(String email) throws UserexceptionMessage;
 
-    public String sendUserMedicines(String userId) throws MessagingException, DocumentException, IOException;
+    public String sendUserMedicines(String userId) throws MessagingException,  IOException;
 
 }
 //////
