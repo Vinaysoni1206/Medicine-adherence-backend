@@ -13,7 +13,6 @@ public class UserDetailsDTO {
     private Long userContact;
     private String gender;
     private String bloodGroup;
-    private String martialStatus;
+    private String maritalStatus;
     private int weight;
 }
-//

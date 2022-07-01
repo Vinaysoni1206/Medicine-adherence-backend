@@ -1,6 +1,6 @@
 package com.example.user_service.config.filter;
 
-import com.example.user_service.model.UserEntity;
+import com.example.user_service.model.user.UserEntity;
 import com.example.user_service.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -24,4 +24,3 @@ public class UserDetailService implements UserDetailsService {
         return  new User(userEntity.getUserName(), "",new ArrayList<>());
     }
 }
-//

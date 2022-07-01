@@ -1,0 +1,74 @@
+package com.example.user_service.model.user;
+
+
+import com.example.user_service.model.medicine.UserMedicines;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
+import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.util.List;
+import com.example.user_service.model.user.UserDetails;
+
+//@NamedNativeQuery(name = "UserEntity.getUserById1",
+//query = "Select u.user_name as userName, u.email as email from user u where u.user_id = ?1",resultSetMapping = "Mapping.UserEntityDTO")
+//@SqlResultSetMapping(name = "Mapping.UserEntityDTO",classes = @ConstructorResult(targetClass = UserEntityDTO.class,columns = {@ColumnResult(name = "userName"),@ColumnResult(name = "email")}))
+
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "user")
+@NamedEntityGraph(name="userDetail_graph" ,
+        attributeNodes = @NamedAttributeNode(value = "userDetails"))
+public class UserEntity {
+
+  @Id
+  @Column(name = "user_id",nullable = false)
+  @GeneratedValue(generator = "UUID")
+  @GenericGenerator(
+          name = "UUID",
+          strategy = "org.hibernate.id.UUIDGenerator"
+  )
+  private String userId;
+
+  @Column(name = "user_name",nullable = false)
+  @NotNull(message = "User name status cannot be empty")
+  @NotEmpty(message = "User name status cannot be empty")
+  private String userName;
+
+  @Column(name = "email",nullable = false)
+  private String email;
+
+  @Column(name = "last_login",nullable = false)
+  private LocalDateTime lastLogin;
+
+  @Column(name = "created_at",nullable = false)
+  private LocalDateTime createdAt;
+
+  @OneToOne(
+          cascade = CascadeType.ALL,
+          mappedBy = "user",
+          fetch = FetchType.LAZY
+  )
+  private  UserDetails userDetails;
+
+
+  @OneToMany(
+          cascade = CascadeType.ALL,
+          mappedBy = "userEntity",
+          fetch = FetchType.EAGER
+  )
+  @JsonIgnore
+  private List<UserMedicines> userMedicines;
+
+
+  public <D> UserEntity(D map) {
+  }
+}
+///

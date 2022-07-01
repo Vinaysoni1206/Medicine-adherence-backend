@@ -1,7 +1,7 @@
 package com.example.user_service.batch;
 
 import com.example.user_service.exception.UserCaretakerException;
-import com.example.user_service.model.UserEntity;
+import com.example.user_service.model.user.UserEntity;
 import com.example.user_service.repository.UserMedicineRepository;
 import com.example.user_service.service.CareTakerServiceImpl;
 import com.example.user_service.util.Datehelper;

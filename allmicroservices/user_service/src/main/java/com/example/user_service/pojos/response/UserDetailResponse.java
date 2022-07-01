@@ -1,7 +1,7 @@
 package com.example.user_service.pojos.response;
 
 
-import com.example.user_service.model.UserDetails;
+import com.example.user_service.model.user.UserDetails;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

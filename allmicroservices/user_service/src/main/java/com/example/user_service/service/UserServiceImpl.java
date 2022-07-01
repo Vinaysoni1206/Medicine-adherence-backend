@@ -4,74 +4,72 @@ package com.example.user_service.service;
 import com.example.user_service.config.PdfMailSender;
 import com.example.user_service.exception.DataAccessExceptionMessage;
 import com.example.user_service.exception.UserExceptionMessage;
-import com.example.user_service.model.MedicineHistory;
-import com.example.user_service.model.UserDetails;
-import com.example.user_service.model.UserEntity;
-import com.example.user_service.model.UserMedicines;
-import com.example.user_service.pojos.dto.UserEntityDTO;
+import com.example.user_service.exception.UserMedicineException;
+import com.example.user_service.model.medicine.MedicineHistory;
+import com.example.user_service.model.user.UserDetails;
+import com.example.user_service.model.user.UserEntity;
+import com.example.user_service.model.medicine.UserMedicines;
+import com.example.user_service.pojos.dto.user.UserDetailEntityDTO;
+import com.example.user_service.pojos.dto.user.UserEntityDTO;
+import com.example.user_service.pojos.dto.user.UserMailDTO;
+import com.example.user_service.pojos.dto.user.UserMedicineDTO;
 import com.example.user_service.pojos.response.UserResponse;
+import com.example.user_service.pojos.response.user.UserDetailResponsePage;
 import com.example.user_service.repository.UserDetailsRepository;
 import com.example.user_service.repository.UserMedicineRepository;
 import com.example.user_service.repository.UserRepository;
 import com.example.user_service.util.Datehelper;
 
 import com.example.user_service.util.JwtUtil;
+import com.example.user_service.util.Messages;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.mail.MessagingException;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 
 @Service
 public class UserServiceImpl implements UserService {
-
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
+    private final UserRepository userRepository;
     private UserDetailsRepository userDetailsRepository;
-
-    @Autowired
     private ModelMapper mapper;
-
-
-    @Autowired
     private PdfMailSender pdfMailSender;
-
-    @Autowired
-    private UserMedicineService userMedicineService;
-
-    @Autowired
     UserMedicineRepository userMedicineRepository;
-    private static final String MSG = "Success";
-    private static final String MSG2 = "failed";
-    @Autowired
     private JwtUtil jwtUtil;
-    @Autowired
     private PasswordEncoder passwordEncoder;
-
     Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
-    private static final String errorMsg = "SQL error!";
-    private static final String exception = "Data not found";
-
-
+    UserServiceImpl( UserRepository userRepository,JwtUtil jwtUtil ,UserDetailsRepository userDetailsRepository,ModelMapper mapper, PdfMailSender pdfMailSender, PasswordEncoder passwordEncoder,UserMedicineRepository userMedicineRepository ){
+        this.userRepository= userRepository;
+        this.userDetailsRepository= userDetailsRepository;
+        this.userMedicineRepository = userMedicineRepository;
+        this.mapper= mapper;
+        this.jwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
+        this.pdfMailSender = pdfMailSender;
+    }
+public UserServiceImpl(UserRepository userRepository2, UserMedicineRepository userMedicineRepository1){
+        this.userRepository= userRepository2;
+        this.userMedicineRepository= userMedicineRepository1;
+    }
     @Override
     public UserResponse saveUser(UserEntityDTO userEntityDTO, String fcmToken, String picPath) throws UserExceptionMessage {
 
         try {
             UserEntity user = getUserByEmail(userEntityDTO.getEmail());
             if (user != null) {
-                return new UserResponse(MSG2, "User is already present", new ArrayList<>(Arrays.asList(user)), "", "");
+                return new UserResponse(Messages.FAILED, "User is already present", new ArrayList<>(Arrays.asList(user)), "", "");
             }
 
             logger.info(Thread.currentThread().getName());
@@ -92,40 +90,39 @@ public class UserServiceImpl implements UserService {
             String jwtToken = jwtUtil.generateToken(ue.getUserName());
             String refreshToken = passwordEncoder.encode(ue.getUserId());
 
-            return new UserResponse(MSG, "Saved user successfully", new ArrayList<>(Arrays.asList(ue)), jwtToken, refreshToken);
+            return new UserResponse(Messages.SUCCESS, "Saved user successfully", new ArrayList<>(Arrays.asList(ue)), jwtToken, refreshToken);
         } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(errorMsg + dataAccessException.getMessage());
+            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
         }
     }
 
     @Override
     @Async
-    public CompletableFuture<List<UserEntity>> getUsers() throws UserExceptionMessage {
-
+    public CompletableFuture<UserDetailResponsePage> getUsers(int pageNo, int pageSize) {
         try {
-            List<UserEntity> list = userRepository.findAllUsers();
+            Pageable paging = PageRequest.of(pageNo,pageSize);
+            Page<UserDetailEntityDTO> userEntityPage = userRepository.findAllUsers(paging);
+//            List<UserDetailEntityDTO> userEntityDTO = userEntityPage.stream().map(p -> new UserDetailEntityDTO(p.getUserName(),p.getEmail(),p.getUserDetails().getBio(),p.getUserDetails().getAge(),p.getUserDetails().getUserContact(),p.getUserDetails().getGender(),p.getUserDetails().getBloodGroup(),p.getUserDetails().getMaritalStatus(),p.getUserDetails().getWeight())).collect(Collectors.toList());
             logger.info(Thread.currentThread().getName());
-            return CompletableFuture.completedFuture(list);
+            return  CompletableFuture.completedFuture(new UserDetailResponsePage(Messages.SUCCESS,Messages.DATA_FOUND,userEntityPage.getTotalElements(),userEntityPage.getTotalPages(),pageNo,userEntityPage.getContent()));
         } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(errorMsg + dataAccessException.getMessage());
+            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
         }
     }
 
 
     @Override
-
     public UserEntity getUserById(String userId) throws UserExceptionMessage {
         try {
             Optional<UserEntity> optionalUserEntity = Optional.ofNullable(userRepository.getUserById(userId));
-
             logger.info(Thread.currentThread().getName());
             if (optionalUserEntity.isEmpty()) {
-                throw new UserExceptionMessage(exception);
+                throw new UserExceptionMessage(Messages.DATA_NOT_FOUND);
             }
 
             return optionalUserEntity.get();
         } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(errorMsg + dataAccessException.getMessage());
+            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
         }
     }
 
@@ -144,7 +141,7 @@ public class UserServiceImpl implements UserService {
 
             return userRepository.save(userDB);
         } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(errorMsg + dataAccessException.getMessage());
+            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
         }
     }
 
@@ -154,29 +151,38 @@ public class UserServiceImpl implements UserService {
         try {
             List<UserEntity> userEntity = userRepository.findByNameIgnoreCase(userName);
             if (userEntity.isEmpty()) {
-                throw new UserExceptionMessage(exception);
+                throw new UserExceptionMessage(Messages.DATA_NOT_FOUND);
             }
             return userEntity;
         } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(errorMsg + dataAccessException.getMessage());
+            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
         }
 
     }
 
     @Override
-    public UserEntity getUserByEmail(String email) throws UserExceptionMessage {
+    public UserMailDTO getUserByEmail1(String email) {
+        try {
+            return userRepository.findByMail1(email);
+        } catch (DataAccessException dataAccessException) {
+            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
+        }
+    }
+
+    @Override
+    public UserEntity getUserByEmail(String email) {
 
         try {
             return userRepository.findByMail(email);
         } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(errorMsg + dataAccessException.getMessage());
+            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
         }
 
     }
 
 
     @Override
-    public String sendUserMedicines(Integer medId) throws MessagingException, IOException {
+    public String sendUserMedicines(Integer medId){
         try {
             Optional<UserMedicines> userMedicines = userMedicineRepository.findById(medId);
             if (userMedicines.isEmpty()) {
@@ -186,7 +192,7 @@ public class UserServiceImpl implements UserService {
             List<MedicineHistory> medicineHistories = userMedicines.get().getMedicineHistories();
             return pdfMailSender.send(entity, userMedicines.get(), medicineHistories);
         } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(errorMsg + dataAccessException.getMessage());
+            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
         }
     }
 
@@ -201,19 +207,49 @@ public class UserServiceImpl implements UserService {
             if (user != null) {
                 String jwtToken = jwtUtil.generateToken(user.getUserName());
                 String refreshToken = passwordEncoder.encode(user.getUserId());
-                return new UserResponse(MSG, "Success", new ArrayList<>(Arrays.asList(user)), jwtToken, refreshToken);
+                return new UserResponse(Messages.SUCCESS, "Success", new ArrayList<>(Arrays.asList(user)), jwtToken, refreshToken);
             }
-            throw new UserExceptionMessage(exception);
+            throw new UserExceptionMessage(Messages.DATA_NOT_FOUND);
 
         } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(errorMsg + dataAccessException.getMessage());
+            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
         }
         catch (NullPointerException e){
-            throw new UserExceptionMessage(exception);
+            throw new UserExceptionMessage(Messages.DATA_NOT_FOUND);
 
         }
 
 
+    }
+
+    @Override
+    public UserDetailEntityDTO getUserById1(String userId) throws UserExceptionMessage {
+        try {
+            Optional<UserDetailEntityDTO> optionalUserEntity = Optional.ofNullable(userRepository.getUserById1(userId));
+            logger.info(Thread.currentThread().getName());
+            if (optionalUserEntity.isEmpty()) {
+                throw new UserExceptionMessage(Messages.DATA_NOT_FOUND);
+            }
+
+            return optionalUserEntity.get();
+        } catch (DataAccessException dataAccessException) {
+            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
+        }
+    }
+
+    @Override
+    public List<UserMedicineDTO> getUserMedicineById(String userId) throws UserExceptionMessage, UserMedicineException, ExecutionException, InterruptedException {
+        try {
+            Optional<List<UserMedicineDTO>> optionalUserEntity = Optional.ofNullable(userRepository.getUserMedicineById(userId));
+            logger.info(Thread.currentThread().getName());
+            if (optionalUserEntity.isEmpty()) {
+                throw new UserExceptionMessage(Messages.DATA_NOT_FOUND);
+            }
+
+            return optionalUserEntity.get();
+        } catch (DataAccessException dataAccessException) {
+            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
+        }
     }
 
     private UserEntity mapToEntity(UserEntityDTO userEntityDTO) {

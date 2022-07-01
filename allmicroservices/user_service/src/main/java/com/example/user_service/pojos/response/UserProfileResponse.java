@@ -1,7 +1,8 @@
 package com.example.user_service.pojos.response;
 
-import com.example.user_service.model.UserEntity;
-import com.example.user_service.model.UserMedicines;
+import com.example.user_service.pojos.dto.user.UserDetailEntityDTO;
+import com.example.user_service.pojos.dto.user.UserEntityDTO;
+import com.example.user_service.pojos.dto.user.UserMedicineDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,8 +15,8 @@ import java.util.List;
 public class UserProfileResponse {
 
      private String status;
-     private List<UserEntity> userEntityList;
-     private List<UserMedicines> medicinesList;
+     private String message;
+     private UserDetailEntityDTO user;
+     private List<UserMedicineDTO> userMedicines;
 
 }
-///

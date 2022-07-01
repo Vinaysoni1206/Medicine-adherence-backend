@@ -1,16 +1,18 @@
 package com.example.user_service.pojos.response;
 
-import com.example.user_service.model.user.UserCaretaker;
+
+import com.example.user_service.model.image.Image;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class CaretakerResponse {
+@AllArgsConstructor
+public class ImageListResponse {
     private String status;
     private String message;
-    private UserCaretaker userCaretaker;
+    private List<Image> imageList;
 }
-//

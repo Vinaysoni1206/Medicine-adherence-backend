@@ -2,8 +2,10 @@ package com.example.user_service.service;
 
 import com.example.user_service.exception.UserCaretakerException;
 import com.example.user_service.exception.UserExceptionMessage;
-import com.example.user_service.model.UserCaretaker;
+import com.example.user_service.model.user.UserCaretaker;
 import com.example.user_service.pojos.dto.UserCaretakerDTO;
+import com.example.user_service.pojos.response.ImageResponse;
+import com.example.user_service.pojos.response.responsepages.CaretakerResponsePage;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -15,7 +17,7 @@ public interface CareTakerService {
 
      UserCaretaker updateCaretakerStatus(String cId) throws UserCaretakerException;
 
-     List<UserCaretaker> getPatientsUnderMe(String userId)throws UserCaretakerException;
+     CaretakerResponsePage getPatientsUnderMe(String userId, int pageNo, int pageSize)throws UserCaretakerException;
 
      List<UserCaretaker> getPatientRequests(String userId) throws UserCaretakerException;
 
@@ -27,6 +29,6 @@ public interface CareTakerService {
 
      String delPatientReq(String cId) throws UserExceptionMessage, UserCaretakerException;
 
-    boolean sendImageToCaretaker(MultipartFile multipartFile , String filename , String caretakerId , String medName, Integer medId) throws IOException , UserCaretakerException;
+     ImageResponse sendImageToCaretaker(MultipartFile multipartFile , String filename , String caretakerId , String medName, Integer medId) throws IOException , UserCaretakerException;
 }
 //

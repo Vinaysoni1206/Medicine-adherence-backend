@@ -1,4 +1,4 @@
-package com.example.user_service.model;
+package com.example.user_service.model.medicine;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor
@@ -15,16 +17,16 @@ import javax.persistence.*;
 public class MedicineHistory {
 
     @Id
-    @Column(name = "history_id")
+    @Column(name = "history_id",nullable = false)
     private int historyId;
 
-    @Column(name = "med_date")
+    @Column(name = "med_date",nullable = false)
     private String date;
 
-    @Column(name = "taken")
+    @Column(name = "taken",nullable = false)
     private String taken;
 
-    @Column(name = "not_taken")
+    @Column(name = "not_taken",nullable = false)
     private String notTaken;
 
     @ManyToOne()

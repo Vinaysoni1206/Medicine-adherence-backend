@@ -2,9 +2,13 @@ package com.example.user_service.service;
 
 import com.example.user_service.exception.UserExceptionMessage;
 import com.example.user_service.exception.UserMedicineException;
-import com.example.user_service.model.UserEntity;
-import com.example.user_service.pojos.dto.UserEntityDTO;
+import com.example.user_service.model.user.UserEntity;
+import com.example.user_service.pojos.dto.user.UserDetailEntityDTO;
+import com.example.user_service.pojos.dto.user.UserEntityDTO;
+import com.example.user_service.pojos.dto.user.UserMailDTO;
+import com.example.user_service.pojos.dto.user.UserMedicineDTO;
 import com.example.user_service.pojos.response.UserResponse;
+import com.example.user_service.pojos.response.user.UserDetailResponsePage;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
@@ -17,7 +21,7 @@ public interface UserService {
 
      UserResponse saveUser(UserEntityDTO userEntityDTO, String fcmToken, String picPath) throws UserExceptionMessage;
 
-     CompletableFuture<List<UserEntity>> getUsers() throws UserExceptionMessage;
+     CompletableFuture<UserDetailResponsePage> getUsers(int pageNo, int pageSize) throws UserExceptionMessage;
 
      UserEntity getUserById(String userId) throws UserExceptionMessage, UserMedicineException, ExecutionException, InterruptedException;
 
@@ -25,12 +29,15 @@ public interface UserService {
 
      List<UserEntity> getUserByName(String userName)throws UserExceptionMessage;
 
+     UserMailDTO getUserByEmail1(String email) throws UserExceptionMessage;
+
      UserEntity getUserByEmail(String email) throws UserExceptionMessage;
 
      String sendUserMedicines(Integer userId) throws MessagingException, IOException;
 
      UserResponse login(String mail , String fcmToken) throws UserExceptionMessage;
 
+     UserDetailEntityDTO getUserById1(String userId) throws UserExceptionMessage, UserMedicineException, ExecutionException, InterruptedException;
 
-
+     List<UserMedicineDTO> getUserMedicineById(String userId) throws UserExceptionMessage, UserMedicineException, ExecutionException, InterruptedException;
 }

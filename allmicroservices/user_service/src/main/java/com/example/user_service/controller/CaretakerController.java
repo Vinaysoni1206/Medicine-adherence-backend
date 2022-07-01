@@ -3,121 +3,125 @@ package com.example.user_service.controller;
 import com.example.user_service.exception.UserCaretakerException;
 
 import com.example.user_service.exception.UserExceptionMessage;
-import com.example.user_service.model.UserCaretaker;
+import com.example.user_service.model.user.UserCaretaker;
 import com.example.user_service.pojos.Notificationmessage;
+import com.example.user_service.pojos.dto.SendImageDto;
 import com.example.user_service.pojos.dto.UserCaretakerDTO;
 import com.example.user_service.pojos.response.CaretakerDelete;
 import com.example.user_service.pojos.response.CaretakerResponse;
-import com.example.user_service.pojos.response.CaretakerResponse1;
+import com.example.user_service.pojos.response.CaretakerListResponse;
 import com.example.user_service.pojos.response.ImageResponse;
+import com.example.user_service.pojos.response.responsepages.CaretakerResponsePage;
 import com.example.user_service.service.CareTakerService;
-import com.example.user_service.service.UserService;
+import com.example.user_service.util.Messages;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v1")
+@Validated
 public class CaretakerController {
-
-    private static final String MSG = "Success";
-    private static final String MSG1 = "Data found";
-    @Autowired
-    private CareTakerService careTakerService;
-    @Autowired
-    private UserService userService;
-
-    @Autowired
+    private final CareTakerService careTakerService;
     RabbitTemplate rabbitTemplate;
 
+    @Value("${project.rabbitmq.exchange}")
+    private String topicExchange;
+
+    @Value("${project.rabbitmq.routingkey2}")
+    private String routingKey2;
+
+    CaretakerController(CareTakerService careTakerService, RabbitTemplate rabbitTemplate){
+        this.careTakerService= careTakerService;
+        this.rabbitTemplate = rabbitTemplate;
+    }
+
     // save caretaker for a patients
-    @PostMapping(value = "/request", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CaretakerResponse> saveCaretaker(@RequestBody UserCaretakerDTO userCaretakerDTO) throws UserCaretakerException {
+    @PostMapping(value = "/request", produces = MediaType.APPLICATION_JSON_VALUE,consumes = "application/json")
+    public ResponseEntity<CaretakerResponse> saveCaretaker(@Valid @RequestBody UserCaretakerDTO userCaretakerDTO) throws UserCaretakerException {
         UserCaretaker userCaretaker = careTakerService.saveCareTaker(userCaretakerDTO);
-        CaretakerResponse caretakerResponse = new CaretakerResponse(MSG, "Request sent successfully", userCaretaker);
+        CaretakerResponse caretakerResponse = new CaretakerResponse(Messages.SUCCESS, "Request sent successfully", userCaretaker);
         return new ResponseEntity<>(caretakerResponse, HttpStatus.OK);
 
     }
 
     // update request status if request is accepted or rejected
-    @PutMapping(value = "/accept")
-    public ResponseEntity<CaretakerResponse> updateCaretakerStatus(@RequestParam(name = "cId") String cId)
+    @PutMapping(value = "/accept",produces = MediaType.APPLICATION_JSON_VALUE, consumes = "application/json")
+    public ResponseEntity<CaretakerResponse> updateCaretakerStatus(@NotNull @NotBlank @RequestParam(name = "cId") String cId)
             throws UserCaretakerException {
         UserCaretaker userCaretaker = careTakerService.updateCaretakerStatus(cId);
-        CaretakerResponse caretakerResponse = new CaretakerResponse(MSG, "Status updated", userCaretaker);
+        CaretakerResponse caretakerResponse = new CaretakerResponse(Messages.SUCCESS, "Status updated", userCaretaker);
         return new ResponseEntity<>(caretakerResponse, HttpStatus.OK);
 
     }
 
 
     // fetch all the patients of a particular caretaker
-    @GetMapping(value = "/patients")
-    public ResponseEntity<CaretakerResponse1> getPatientsUnderMe(@RequestParam(name = "caretakerId") String userId)
-            throws UserCaretakerException {
-        List<UserCaretaker> userCaretakerList = careTakerService.getPatientsUnderMe(userId);
-        CaretakerResponse1 caretakerResponse1 = new CaretakerResponse1(MSG, MSG1, userCaretakerList);
-        return new ResponseEntity<>(caretakerResponse1, HttpStatus.OK);
+    @GetMapping(value = "/patients",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CaretakerResponsePage> getPatientsUnderMe(@NotNull @NotBlank @RequestParam(name = "caretakerId") String userId,
+                                                                    @RequestParam(defaultValue = "0") int pageNo,
+                                                                    @RequestParam(defaultValue = "3") int pageSize) throws UserCaretakerException {
+
+        return new ResponseEntity<>(careTakerService.getPatientsUnderMe(userId, pageNo,pageSize), HttpStatus.OK);
     }
 
     // fetch all the request sent by a patients to a caretaker
-    @GetMapping(value = "/patient/requests")
-    public ResponseEntity<CaretakerResponse1> getPatientRequestsC(@RequestParam(name = "caretakerId") String userId) throws UserCaretakerException {
+    @GetMapping(value = "/patient/requests",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CaretakerListResponse> getPatientRequestsC(@NotNull @NotBlank @RequestParam(name = "caretakerId") String userId) throws UserCaretakerException {
         List<UserCaretaker> userCaretakerList = careTakerService.getPatientRequests(userId);
-        CaretakerResponse1 caretakerResponse1 = new CaretakerResponse1(MSG, MSG1, userCaretakerList);
+        CaretakerListResponse caretakerResponse1 = new CaretakerListResponse(Messages.SUCCESS, Messages.DATA_FOUND, userCaretakerList);
         return new ResponseEntity<>(caretakerResponse1, HttpStatus.OK);
 
     }
 
     // where the patients can view all his caretakers
-    @GetMapping(value = "/caretakers")
-    public ResponseEntity<CaretakerResponse1> getMyCaretakers(@RequestParam(name = "patientId") String userId) throws UserCaretakerException {
+    @GetMapping(value = "/caretakers",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CaretakerListResponse> getMyCaretakers(@NotNull @NotBlank @RequestParam(name = "patientId") String userId) throws UserCaretakerException {
         List<UserCaretaker> userCaretakerList = careTakerService.getMyCaretakers(userId);
-        CaretakerResponse1 caretakerResponse1 = new CaretakerResponse1(MSG, MSG1, userCaretakerList);
+        CaretakerListResponse caretakerResponse1 = new CaretakerListResponse(Messages.SUCCESS, Messages.DATA_FOUND, userCaretakerList);
         return new ResponseEntity<>(caretakerResponse1, HttpStatus.OK);
     }
 
     // to check the status of a request by caretaker
 
-    @GetMapping(value = "/caretaker/requests")
-    public ResponseEntity<CaretakerResponse1> getCaretakerRequestsP(@RequestParam(name = "patientId") String userId) throws UserCaretakerException {
+    @GetMapping(value = "/caretaker/requests",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CaretakerListResponse> getCaretakerRequestsP(@NotNull @NotBlank @RequestParam(name = "patientId") String userId) throws UserCaretakerException {
         List<UserCaretaker> userCaretakerList = careTakerService.getCaretakerRequestsP(userId);
-        CaretakerResponse1 caretakerResponse1 = new CaretakerResponse1(MSG, MSG1, userCaretakerList);
+        CaretakerListResponse caretakerResponse1 = new CaretakerListResponse(Messages.SUCCESS, Messages.DATA_FOUND, userCaretakerList);
         return new ResponseEntity<>(caretakerResponse1, HttpStatus.OK);
 
     }
 
-    @GetMapping(value = "/delete")
-    public ResponseEntity<CaretakerDelete> delPatientReq(@RequestParam(name = "cId") String cId) throws UserExceptionMessage, UserCaretakerException {
+    @GetMapping(value = "/delete",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CaretakerDelete> delPatientReq(@NotNull @NotBlank @RequestParam(name = "cId") String cId) throws UserExceptionMessage, UserCaretakerException {
         String delPatientStatus = careTakerService.delPatientReq(cId);
         CaretakerDelete caretakerDelete = new CaretakerDelete(delPatientStatus, "Deleted successfully");
         return new ResponseEntity<>(caretakerDelete, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/notifyuser")
-    public ResponseEntity<String> notifyUserForMed(@RequestParam(name = "fcmToken") String fcmToken, @RequestParam("medname") String body) {
+    @GetMapping(value = "/notifyuser",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> notifyUserForMed(@NotNull @NotBlank @RequestParam(name = "fcmToken") String fcmToken,@NotNull @NotBlank @RequestParam("medname") String body) {
 
-        rabbitTemplate.convertAndSend("project_exchange", "notification_key", new Notificationmessage(fcmToken, "Take medicine", "patient", body, ""));
+        rabbitTemplate.convertAndSend(topicExchange,routingKey2, new Notificationmessage(fcmToken, "Take medicine", "patient", body, ""));
         return new ResponseEntity<>("Ok", HttpStatus.OK);
 
     }
 
-    @PostMapping(value = "/image")
-    public ImageResponse sendImageToCaretaker(@RequestParam(name = "image") MultipartFile multipartFile
-            , @RequestParam(name = "name") String filename, @RequestParam("medName") String medName,
-                                              @RequestParam(name = "id") String caretakerId,
-                                              @RequestParam(name = "medId") Integer medId) throws IOException, UserCaretakerException {
+    @PostMapping(value = "/image",produces = MediaType.APPLICATION_JSON_VALUE,consumes = "application/json")
+    public ResponseEntity<ImageResponse> sendImageToCaretaker(@Valid @ModelAttribute SendImageDto sendImageDto) throws IOException, UserCaretakerException {
 
-        if(careTakerService.sendImageToCaretaker(multipartFile, filename, caretakerId, medName, medId)) {
-            return new ImageResponse(MSG,"Image sent successfully!");
-        }
-        return new ImageResponse("failed","Image not sent");
+        ImageResponse imageResponse= careTakerService.sendImageToCaretaker(sendImageDto.getImage(),sendImageDto.getName(),sendImageDto.getMedName(),sendImageDto.getId(),sendImageDto.getMedId());
+        return new ResponseEntity<>(imageResponse,HttpStatus.OK);
     }
 
 ////

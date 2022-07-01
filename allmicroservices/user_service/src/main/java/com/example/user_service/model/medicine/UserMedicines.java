@@ -1,9 +1,12 @@
-package com.example.user_service.model;
+package com.example.user_service.model.medicine;
 
+import com.example.user_service.model.user.UserEntity;
+import com.example.user_service.model.image.Image;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Range;
 
 
 import javax.persistence.*;
@@ -17,34 +20,36 @@ import java.util.List;
 public class UserMedicines {
 
     @Id
-    @Column(name = "medicine_id")
+    @Column(name = "medicine_id",nullable = false)
     private int medicineId;
 
-    @Column(name = "start_date")
+    @Column(name = "start_date",nullable = false)
     private String startDate;
 
-    @Column(name = "medicine_name")
+    @Column(name = "medicine_name",nullable = false, length = 70)
     private String medicineName;
 
-    @Column(name = "medicine_des")
+    @Column(name = "medicine_des",nullable = false,length = 200)
     private String medicineDes;
 
-    @Column(name = "days")
+    @Column(name = "days",nullable = false,length = 4)
     private String days;
 
-    @Column(name = "end_date")
+    @Column(name = "end_date",nullable = false)
     private String endDate;
 
-    @Column(name = "time")
+    @Column(name = "time",nullable = false)
     private String time;
 
-    @Column(name = "title")
+    @Column(name = "title",nullable = false, length = 200)
     private String title;
 
-    @Column(name = "total_med_reminders")
+    @Column(name = "total_med_reminders",nullable = false)
+    @Range(min = 0)
     private int totalMedReminders;
 
-    @Column(name = "current_count")
+    @Column(name = "current_count",nullable = false)
+    @Range(min = 0)
     private int currentCount;
 
 

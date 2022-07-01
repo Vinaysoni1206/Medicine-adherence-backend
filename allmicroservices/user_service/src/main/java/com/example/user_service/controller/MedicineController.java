@@ -1,47 +1,50 @@
 package com.example.user_service.controller;
 
 
-import com.example.user_service.exception.UserExceptionMessage;
 import com.example.user_service.exception.UserMedicineException;
-import com.example.user_service.model.*;
-import com.example.user_service.pojos.dto.MedicineHistoryDTO;
+import com.example.user_service.model.medicine.UserMedicines;
+import com.example.user_service.model.user.UserEntity;
+import com.example.user_service.pojos.dto.medicine.MedicineHistoryDTO;
 
-import com.example.user_service.pojos.dto.MedicinePojo;
+import com.example.user_service.pojos.dto.medicine.MedicinePojo;
+import com.example.user_service.pojos.response.ImageListResponse;
 import com.example.user_service.pojos.response.MedicineResponse;
 import com.example.user_service.pojos.response.SyncResponse;
 import com.example.user_service.repository.UserMedicineRepository;
 import com.example.user_service.repository.UserRepository;
 import com.example.user_service.service.UserMedicineService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
+import com.example.user_service.util.Messages;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/api/v1/")
+@Validated
 public class MedicineController {
 
-    @Autowired
-    private UserMedicineService userMedicineService;
-
-    @Autowired
+    private final UserMedicineService userMedicineService;
     UserRepository userRepository;
-
-    @Autowired
     UserMedicineRepository userMedicineRepository;
 
+    MedicineController(UserMedicineService userMedicineService, UserRepository userRepository, UserMedicineRepository userMedicineRepository){
+        this.userMedicineRepository= userMedicineRepository;
+        this.userRepository= userRepository;
+        this.userMedicineService=userMedicineService;
+    }
+
     // save caretaker for a patients
-    private static final String MSG = "Success";
-
-
     @PostMapping(value = "/medicines/sync", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SyncResponse> syncData(@RequestParam("userId") String userId, @RequestBody List<MedicinePojo> medicinePojo) throws UserMedicineException {
+    public ResponseEntity<SyncResponse> syncData(@NotNull @NotBlank  @RequestParam("userId") String userId,@Valid @RequestBody List<MedicinePojo> medicinePojo) throws UserMedicineException {
 
         try {
             UserEntity userEntity = userRepository.getUserById(userId);
@@ -66,7 +69,7 @@ public class MedicineController {
                     .collect(Collectors.toList());
 
             userMedicineRepository.saveAll(userMedicinesList);
-            return new ResponseEntity<>(new SyncResponse(MSG, "Synced Successfully"), HttpStatus.OK);
+            return new ResponseEntity<>(new SyncResponse(Messages.SUCCESS, "Synced Successfully"), HttpStatus.OK);
         }
         catch (Exception exception){
             throw new UserMedicineException("Sync failed");
@@ -75,12 +78,12 @@ public class MedicineController {
     }
 
     @PostMapping(value = "/medicine-history/sync")
-    public ResponseEntity<SyncResponse> syncMedicineHistory(@RequestParam(name = "medId") Integer medId,
-                                                 @RequestBody List<MedicineHistoryDTO> medicineHistory) throws UserMedicineException {
+    public ResponseEntity<SyncResponse> syncMedicineHistory(@NotNull @NotBlank @RequestParam(name = "medId") Integer medId,
+                                                 @Valid @RequestBody List<MedicineHistoryDTO> medicineHistory) throws UserMedicineException {
         try {
 
             userMedicineService.syncMedicineHistory(medId, medicineHistory);
-            return new ResponseEntity<>(new SyncResponse(MSG, "Synced Successfully"), HttpStatus.OK);
+            return new ResponseEntity<>(new SyncResponse(Messages.SUCCESS, "Synced Successfully"), HttpStatus.OK);
         }catch (Exception e){
             throw new UserMedicineException("Sync failed");
         }
@@ -88,7 +91,7 @@ public class MedicineController {
     }
 
     @GetMapping(value = "/medicine-histories")
-    public ResponseEntity<MedicineResponse> getMedicineHistories(@RequestParam(name = "medId") Integer medId) throws UserMedicineException {
+    public ResponseEntity<MedicineResponse> getMedicineHistories(@NotNull @NotBlank @RequestParam(name = "medId") Integer medId) throws UserMedicineException {
 
      return new ResponseEntity<>(userMedicineService.getMedicineHistory(medId),HttpStatus.OK);
 
@@ -96,14 +99,11 @@ public class MedicineController {
     }
 
     @GetMapping(value = "/medicine-images")
-    public ResponseEntity<List<Image>> getMedicineImages(@RequestParam(name = "medId") Integer medId){
+    public ResponseEntity<ImageListResponse> getMedicineImages(@NotNull @NotBlank @RequestParam(name = "medId") Integer medId){
 
-
-        return new ResponseEntity<>(userMedicineService.getUserMedicineImages(medId),HttpStatus.OK);
+        ImageListResponse imageListResponse= new ImageListResponse(Messages.SUCCESS,Messages.DATA_FOUND,userMedicineService.getUserMedicineImages(medId));
+        return new ResponseEntity<>(imageListResponse,HttpStatus.OK);
 
 
     }
-
-
 }
-////

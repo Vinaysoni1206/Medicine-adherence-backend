@@ -4,19 +4,27 @@ package com.example.user_service.service;
 import com.example.user_service.exception.DataAccessExceptionMessage;
 import com.example.user_service.exception.UserCaretakerException;
 import com.example.user_service.exception.UserExceptionMessage;
-import com.example.user_service.model.Image;
-import com.example.user_service.model.UserCaretaker;
-import com.example.user_service.model.UserMedicines;
+import com.example.user_service.model.image.Image;
+import com.example.user_service.model.user.UserCaretaker;
+import com.example.user_service.model.medicine.UserMedicines;
 import com.example.user_service.pojos.Notificationmessage;
 import com.example.user_service.pojos.dto.UserCaretakerDTO;
+import com.example.user_service.pojos.response.ImageResponse;
+import com.example.user_service.pojos.response.responsepages.CaretakerResponsePage;
 import com.example.user_service.repository.ImageRepository;
 import com.example.user_service.repository.UserCaretakerRepository;
 import com.example.user_service.repository.UserMedicineRepository;
 import com.example.user_service.util.Datehelper;
+import com.example.user_service.util.Messages;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,30 +33,32 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CareTakerServiceImpl implements CareTakerService {
 
-    @Autowired
-    private UserCaretakerRepository userCaretakerRepository;
 
-    @Autowired
-    private ModelMapper mapper;
+    private final UserCaretakerRepository userCaretakerRepository;
+    private final ModelMapper mapper;
+    private final ImageRepository imageRepository;
+    private final UserMedicineRepository userMedicineRepository;
+    private final RabbitTemplate rabbitTemplate;
 
-    @Autowired
-    private ImageRepository imageRepository;
+    @Value("${project.rabbitmq.exchange}")
+    private String topicExchange;
 
-    @Autowired
-    private UserMedicineRepository userMedicineRepository;
-    @Autowired
-    RabbitTemplate rabbitTemplate;
+    @Value("${project.rabbitmq.routingkey2}")
+    private String routingKey2;
 
-    private static final String MSG = "Data not found";
-    private static final String errorMsg = "SQL error!";
-
+    Logger logger = LoggerFactory.getLogger(CareTakerServiceImpl.class);
+    CareTakerServiceImpl(ImageRepository imageRepository, UserMedicineRepository userMedicineRepository, RabbitTemplate rabbitTemplate, UserCaretakerRepository userCaretakerRepository, ModelMapper modelMapper){
+        this.imageRepository=imageRepository;
+        this.userMedicineRepository= userMedicineRepository;
+        this.rabbitTemplate= rabbitTemplate;
+        this.userCaretakerRepository= userCaretakerRepository;
+        this.mapper= modelMapper;
+    }
     @Override
     public UserCaretaker saveCareTaker(UserCaretakerDTO userCaretakerDTO) throws UserCaretakerException {
 
@@ -61,7 +71,7 @@ public class CareTakerServiceImpl implements CareTakerService {
                 return userCaretakerRepository.save(userCaretaker);
             }
         } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(errorMsg + dataAccessException.getMessage());
+            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
         }
     }
 
@@ -75,34 +85,35 @@ public class CareTakerServiceImpl implements CareTakerService {
             uc.get().setReqStatus(true);
             return userCaretakerRepository.save(uc.get());
         } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(errorMsg + dataAccessException.getMessage());
+            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
         }
     }
 
     @Override
-    public List<UserCaretaker> getPatientsUnderMe(String userId) throws UserCaretakerException {
+    public CaretakerResponsePage getPatientsUnderMe(String userId, int pageNo, int pageSize) throws UserCaretakerException {
 
         try {
-            List<UserCaretaker> userCaretaker = userCaretakerRepository.getPatientsUnderMe(userId);
-            if (userCaretaker.isEmpty()) {
-                throw new UserCaretakerException(MSG);
+            Pageable pageable= PageRequest.of(pageNo,pageSize);
+            Page<UserCaretaker> userCaretakerPage = userCaretakerRepository.getPatientsUnderMe(userId, pageable);
+            if (userCaretakerPage.isEmpty()) {
+                throw new UserCaretakerException(Messages.DATA_NOT_FOUND);
             }
-            return userCaretaker;
+            return new CaretakerResponsePage(Messages.SUCCESS,Messages.DATA_FOUND,userCaretakerPage.getTotalElements(),userCaretakerPage.getTotalPages(),pageNo,userCaretakerPage.getContent());
         } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(errorMsg + dataAccessException.getMessage());
+            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
         }
     }
 
     @Override
     public List<UserCaretaker> getPatientRequests(String userId) throws UserCaretakerException {
         try {
-            List<UserCaretaker> userCaretaker = userCaretakerRepository.getPatientRequests(userId);
+            List<UserCaretaker> userCaretaker =userCaretakerRepository.getPatientRequests(userId);
             if (userCaretaker.isEmpty()) {
-                throw new UserCaretakerException(MSG);
+                throw new UserCaretakerException(Messages.DATA_NOT_FOUND);
             }
             return userCaretaker;
         } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(errorMsg + dataAccessException.getMessage());
+            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
         }
     }
 
@@ -111,11 +122,11 @@ public class CareTakerServiceImpl implements CareTakerService {
         try {
             List<UserCaretaker> userCaretaker = userCaretakerRepository.getMyCaretakers(userId);
             if (userCaretaker.isEmpty()) {
-                throw new UserCaretakerException(MSG);
+                throw new UserCaretakerException(Messages.DATA_NOT_FOUND);
             }
             return userCaretaker;
         } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(errorMsg + dataAccessException.getMessage());
+            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
         }
     }
 
@@ -124,7 +135,7 @@ public class CareTakerServiceImpl implements CareTakerService {
         try {
             return userCaretakerRepository.getCaretakerRequestStatus(userId);
         } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(errorMsg + dataAccessException.getMessage());
+            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
         }
     }
 
@@ -134,11 +145,11 @@ public class CareTakerServiceImpl implements CareTakerService {
         try {
             List<UserCaretaker> userCaretaker = userCaretakerRepository.getCaretakerRequestsP(userId);
             if (userCaretaker.isEmpty()) {
-                throw new UserCaretakerException(MSG);
+                throw new UserCaretakerException(Messages.DATA_NOT_FOUND);
             }
             return userCaretaker;
         } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(errorMsg + dataAccessException.getMessage());
+            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
         }
     }
 
@@ -150,17 +161,17 @@ public class CareTakerServiceImpl implements CareTakerService {
             Optional<UserCaretaker> userCaretaker = userCaretakerRepository.findById(cId);
             if (userCaretaker.isPresent()) {
                 userCaretakerRepository.delete(userCaretaker.get());
-                return "Success";
+                return Messages.SUCCESS;
 
             }
-            throw new UserCaretakerException("No record found");
+            throw new UserCaretakerException(Messages.NO_RECORD_FOUND);
         } catch (Exception e) {
-            throw new UserCaretakerException("No record found");
+            throw new UserCaretakerException(Messages.NO_RECORD_FOUND);
         }
     }
 
     @Override
-    public boolean sendImageToCaretaker(MultipartFile multipartFile, String filename, String caretakerid, String medName, Integer medId) throws IOException, UserCaretakerException {
+    public ImageResponse sendImageToCaretaker(MultipartFile multipartFile, String filename, String caretakerid, String medName, Integer medId) throws IOException, UserCaretakerException {
 
         try {
             File file = new File(System.getProperty("user.dir") + "/src/main/upload/static/images");
@@ -180,13 +191,14 @@ public class CareTakerServiceImpl implements CareTakerService {
             image.setCaretakerName(userName);
             imageRepository.save(image);
             String fcmToken = "epkw4MI-RxyMzZjvD6fUl6:APA91bEUyAJpJ5RmDyI1KLcMLJbBPiYSX64oIW4WkNq62zeUlMPUPknGkBHTB_drOBX6CUkiI0Pyfc4Myvt87v6BU69kz0LPq4YM9iWnG9RrNbxIpC4LrtE-zWfNdbB3dbjR2bmogops";
-            rabbitTemplate.convertAndSend("project_exchange", "notification_key", new Notificationmessage(fcmToken, "Take medicine", "caretaker", medName, filename + ".jpg"));
+            rabbitTemplate.convertAndSend(topicExchange, routingKey2, new Notificationmessage(fcmToken, "Take medicine", "caretaker", medName, filename + ".jpg"));
 
         } catch (Exception e) {
-            return false;
+            logger.info(e.getMessage());
+            return new ImageResponse(Messages.FAILED,Messages.UNABLE_TO_SEND);
         }
 
-        return true;
+        return new ImageResponse(Messages.SUCCESS,Messages.SENT_SUCCESS);
     }
 
     private UserCaretaker mapToEntity(UserCaretakerDTO userCaretakerDTO) {

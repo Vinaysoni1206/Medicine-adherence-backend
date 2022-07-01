@@ -1,9 +1,9 @@
 package com.example.user_service.config;
 
-import com.example.user_service.model.MedicineHistory;
-import com.example.user_service.model.UserDetails;
-import com.example.user_service.model.UserEntity;
-import com.example.user_service.model.UserMedicines;
+import com.example.user_service.model.medicine.MedicineHistory;
+import com.example.user_service.model.user.UserDetails;
+import com.example.user_service.model.user.UserEntity;
+import com.example.user_service.model.medicine.UserMedicines;
 import com.itextpdf.html2pdf.HtmlConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +89,7 @@ public class PdfMailSender {
 
             medicineHistory += " <tr>\n" +
                     "                <td style='border: 0.5px solid black;text-align: center;vertical-align: middle;height: 40px;'>" + medicineHistory1.getDate() + "</td>\n" +
-                    "                <td style='border: 0.5px solid black;text-align: center;vertical-align: middle;height: 40px;'>" + medicineHistory1.getTaken() + "</td>\n" +
+                    "                <td style='border: 0.5px solid black;text-align: center;vertical-align: middle;height: 40px;'>" + "<span>"+medicineHistory1.getTaken() +"</span><br></td>\n" +
                     "                <td style='border: 0.5px solid black;text-align: center;vertical-align: middle;height: 40px;'>" + medicineHistory1.getNotTaken() + "</td>\n" +
                     "            </tr>\n";
 

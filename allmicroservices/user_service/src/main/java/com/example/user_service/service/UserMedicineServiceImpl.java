@@ -3,11 +3,11 @@ package com.example.user_service.service;
 import com.example.user_service.exception.DataAccessExceptionMessage;
 import com.example.user_service.exception.UserExceptionMessage;
 import com.example.user_service.exception.UserMedicineException;
-import com.example.user_service.model.Image;
-import com.example.user_service.model.MedicineHistory;
-import com.example.user_service.model.UserEntity;
-import com.example.user_service.model.UserMedicines;
-import com.example.user_service.pojos.dto.MedicineHistoryDTO;
+import com.example.user_service.model.image.Image;
+import com.example.user_service.model.medicine.MedicineHistory;
+import com.example.user_service.model.user.UserEntity;
+import com.example.user_service.model.medicine.UserMedicines;
+import com.example.user_service.pojos.dto.medicine.MedicineHistoryDTO;
 import com.example.user_service.pojos.response.MedicineResponse;
 import com.example.user_service.repository.ImageRepository;
 import com.example.user_service.repository.UserMedHistoryRepository;
@@ -46,6 +46,7 @@ public class UserMedicineServiceImpl implements UserMedicineService {
     UserMedHistoryRepository userMedHistoryRepository;
 
     Logger logger = LoggerFactory.getLogger(UserMedicineServiceImpl.class);
+
 
     private static final String errorMsg = "SQL error!";
 

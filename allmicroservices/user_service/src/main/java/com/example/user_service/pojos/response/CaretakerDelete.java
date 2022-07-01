@@ -13,4 +13,3 @@ public class CaretakerDelete {
     private String status;
     private String message;
 }
-//

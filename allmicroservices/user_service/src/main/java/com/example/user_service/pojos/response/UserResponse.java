@@ -1,6 +1,6 @@
 package com.example.user_service.pojos.response;
 
-import com.example.user_service.model.UserEntity;
+import com.example.user_service.model.user.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,4 +19,3 @@ public class UserResponse {
     private String jwt;
     private String refreshToken;
 }
-///
