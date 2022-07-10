@@ -2,8 +2,11 @@ package com.example.user_service.util;
 
 public class Messages {
 
+    Messages(){}
+
     public static  final String DATA_NOT_FOUND = "Data not found";
 
+    public static final String ERROR = "Error!!";
     public  static  final String DATA_FOUND = "Data found ";
     public static final String REQ_SENT_SUCCESS = "Request sent successfully";
 
@@ -18,6 +21,8 @@ public class Messages {
     public static final String MEDICINE_NOT_FOUND = "Medicine not found";
 
     public static final String NO_RECORD_FOUND = "No record found";
+
+    public static final String CARETAKER_ALREADY_PRESENT= "Caretaker already present";
 
 
 

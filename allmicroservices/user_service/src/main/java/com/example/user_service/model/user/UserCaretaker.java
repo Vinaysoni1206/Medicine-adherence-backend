@@ -50,4 +50,3 @@ public class UserCaretaker {
     public <D> UserCaretaker(D map) {
     }
 }
-///

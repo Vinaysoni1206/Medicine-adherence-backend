@@ -7,18 +7,22 @@ import com.example.user_service.model.user.UserCaretaker;
 import com.example.user_service.pojos.Notificationmessage;
 import com.example.user_service.pojos.dto.SendImageDto;
 import com.example.user_service.pojos.dto.UserCaretakerDTO;
-import com.example.user_service.pojos.response.CaretakerDelete;
-import com.example.user_service.pojos.response.CaretakerResponse;
-import com.example.user_service.pojos.response.CaretakerListResponse;
+import com.example.user_service.pojos.response.caretaker.CaretakerDelete;
+import com.example.user_service.pojos.response.caretaker.CaretakerResponse;
 import com.example.user_service.pojos.response.ImageResponse;
-import com.example.user_service.pojos.response.responsepages.CaretakerResponsePage;
-import com.example.user_service.service.CareTakerService;
+import com.example.user_service.pojos.response.caretaker.CaretakerResponsePage;
+import com.example.user_service.service.caretaker.CareTakerService;
 import com.example.user_service.util.Messages;
+import io.micrometer.core.annotation.Timed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,13 +45,17 @@ public class CaretakerController {
     @Value("${project.rabbitmq.routingkey2}")
     private String routingKey2;
 
+    Logger logger = LoggerFactory.getLogger(CaretakerController.class);
     CaretakerController(CareTakerService careTakerService, RabbitTemplate rabbitTemplate){
         this.careTakerService= careTakerService;
         this.rabbitTemplate = rabbitTemplate;
     }
 
     // save caretaker for a patients
-    @PostMapping(value = "/request", produces = MediaType.APPLICATION_JSON_VALUE,consumes = "application/json")
+    @PostMapping(value = "/request", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @Transactional(timeout = 12)
+    @Retryable(maxAttempts = 4)// retrying up to 4 times
     public ResponseEntity<CaretakerResponse> saveCaretaker(@Valid @RequestBody UserCaretakerDTO userCaretakerDTO) throws UserCaretakerException {
         UserCaretaker userCaretaker = careTakerService.saveCareTaker(userCaretakerDTO);
         CaretakerResponse caretakerResponse = new CaretakerResponse(Messages.SUCCESS, "Request sent successfully", userCaretaker);
@@ -56,6 +64,7 @@ public class CaretakerController {
     }
 
     // update request status if request is accepted or rejected
+    @Retryable(maxAttempts = 4)// retrying up to 4 times
     @PutMapping(value = "/accept",produces = MediaType.APPLICATION_JSON_VALUE, consumes = "application/json")
     public ResponseEntity<CaretakerResponse> updateCaretakerStatus(@NotNull @NotBlank @RequestParam(name = "cId") String cId)
             throws UserCaretakerException {
@@ -67,6 +76,7 @@ public class CaretakerController {
 
 
     // fetch all the patients of a particular caretaker
+    @Retryable(maxAttempts = 4)// retrying up to 4 times
     @GetMapping(value = "/patients",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CaretakerResponsePage> getPatientsUnderMe(@NotNull @NotBlank @RequestParam(name = "caretakerId") String userId,
                                                                     @RequestParam(defaultValue = "0") int pageNo,
@@ -76,28 +86,31 @@ public class CaretakerController {
     }
 
     // fetch all the request sent by a patients to a caretaker
+    @Retryable(maxAttempts = 4)// retrying up to 4 times
     @GetMapping(value = "/patient/requests",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CaretakerListResponse> getPatientRequestsC(@NotNull @NotBlank @RequestParam(name = "caretakerId") String userId) throws UserCaretakerException {
+    public ResponseEntity<CaretakerDelete.CaretakerListResponse> getPatientRequestsC(@NotNull @NotBlank @RequestParam(name = "caretakerId") String userId) throws UserCaretakerException {
         List<UserCaretaker> userCaretakerList = careTakerService.getPatientRequests(userId);
-        CaretakerListResponse caretakerResponse1 = new CaretakerListResponse(Messages.SUCCESS, Messages.DATA_FOUND, userCaretakerList);
+        CaretakerDelete.CaretakerListResponse caretakerResponse1 = new CaretakerDelete.CaretakerListResponse(Messages.SUCCESS, Messages.DATA_FOUND, userCaretakerList);
         return new ResponseEntity<>(caretakerResponse1, HttpStatus.OK);
 
     }
 
     // where the patients can view all his caretakers
+    @Retryable(maxAttempts = 4)// retrying up to 4 times
     @GetMapping(value = "/caretakers",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CaretakerListResponse> getMyCaretakers(@NotNull @NotBlank @RequestParam(name = "patientId") String userId) throws UserCaretakerException {
+    public ResponseEntity<CaretakerDelete.CaretakerListResponse> getMyCaretakers(@NotNull @NotBlank @RequestParam(name = "patientId") String userId) throws UserCaretakerException {
         List<UserCaretaker> userCaretakerList = careTakerService.getMyCaretakers(userId);
-        CaretakerListResponse caretakerResponse1 = new CaretakerListResponse(Messages.SUCCESS, Messages.DATA_FOUND, userCaretakerList);
+        CaretakerDelete.CaretakerListResponse caretakerResponse1 = new CaretakerDelete.CaretakerListResponse(Messages.SUCCESS, Messages.DATA_FOUND, userCaretakerList);
         return new ResponseEntity<>(caretakerResponse1, HttpStatus.OK);
     }
 
     // to check the status of a request by caretaker
 
+    @Retryable(maxAttempts = 4)// retrying up to 4 times
     @GetMapping(value = "/caretaker/requests",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CaretakerListResponse> getCaretakerRequestsP(@NotNull @NotBlank @RequestParam(name = "patientId") String userId) throws UserCaretakerException {
+    public ResponseEntity<CaretakerDelete.CaretakerListResponse> getCaretakerRequestsP(@NotNull @NotBlank @RequestParam(name = "patientId") String userId) throws UserCaretakerException {
         List<UserCaretaker> userCaretakerList = careTakerService.getCaretakerRequestsP(userId);
-        CaretakerListResponse caretakerResponse1 = new CaretakerListResponse(Messages.SUCCESS, Messages.DATA_FOUND, userCaretakerList);
+        CaretakerDelete.CaretakerListResponse caretakerResponse1 = new CaretakerDelete.CaretakerListResponse(Messages.SUCCESS, Messages.DATA_FOUND, userCaretakerList);
         return new ResponseEntity<>(caretakerResponse1, HttpStatus.OK);
 
     }
@@ -110,16 +123,22 @@ public class CaretakerController {
     }
 
     @GetMapping(value = "/notifyuser",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> notifyUserForMed(@NotNull @NotBlank @RequestParam(name = "fcmToken") String fcmToken,@NotNull @NotBlank @RequestParam("medname") String body) {
+    @Timed
+    @Retryable(maxAttempts = 4)// retrying up to 4 times
+    @Transactional(timeout = 6)
+    public ResponseEntity<String> notifyUserForMed(@NotNull @NotBlank @RequestParam(name = "fcmToken") String fcmToken,@NotNull @NotBlank @RequestParam(name = "medname") String body) {
 
         rabbitTemplate.convertAndSend(topicExchange,routingKey2, new Notificationmessage(fcmToken, "Take medicine", "patient", body, ""));
         return new ResponseEntity<>("Ok", HttpStatus.OK);
 
     }
 
-    @PostMapping(value = "/image",produces = MediaType.APPLICATION_JSON_VALUE,consumes = "application/json")
-    public ResponseEntity<ImageResponse> sendImageToCaretaker(@Valid @ModelAttribute SendImageDto sendImageDto) throws IOException, UserCaretakerException {
+    @PostMapping(value = "/image",produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @Transactional(timeout = 10)
+    public ResponseEntity<ImageResponse> sendImageToCaretaker(@Valid @ModelAttribute("sendImageDto") SendImageDto sendImageDto) throws IOException, UserCaretakerException {
 
+        logger.info("sending image");
         ImageResponse imageResponse= careTakerService.sendImageToCaretaker(sendImageDto.getImage(),sendImageDto.getName(),sendImageDto.getMedName(),sendImageDto.getId(),sendImageDto.getMedId());
         return new ResponseEntity<>(imageResponse,HttpStatus.OK);
     }

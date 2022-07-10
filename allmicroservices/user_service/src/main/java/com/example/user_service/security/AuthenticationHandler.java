@@ -43,7 +43,7 @@ public class AuthenticationHandler implements HandlerInterceptor {
                 logger.info(username);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
         if (username != null) {

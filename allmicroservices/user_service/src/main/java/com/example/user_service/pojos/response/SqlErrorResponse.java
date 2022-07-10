@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class SqlErrorResponse {
 
     private String message;
-    private String Status;
+    private String status;
 
 
 }

@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 @SpringBootConfiguration
-public class UserServiceApplicationTests {
+class UserServiceApplicationTests {
 
 
     @Test

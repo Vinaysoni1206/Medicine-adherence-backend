@@ -19,4 +19,5 @@ public class UserDetailResponsePage {
     private List<UserDetailEntityDTO> users;
 
 
+
 }

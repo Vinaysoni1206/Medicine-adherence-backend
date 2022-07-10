@@ -2,7 +2,6 @@ package com.example.user_service.repository;
 
 import com.example.user_service.model.user.UserEntity;
 import com.example.user_service.pojos.dto.user.UserDetailEntityDTO;
-import com.example.user_service.pojos.dto.user.UserEntityDTO;
 import com.example.user_service.pojos.dto.user.UserMailDTO;
 import com.example.user_service.pojos.dto.user.UserMedicineDTO;
 import org.springframework.data.domain.Page;

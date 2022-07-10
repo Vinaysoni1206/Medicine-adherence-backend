@@ -22,7 +22,4 @@ public class MedicinePojo {
     private int status;
     private String time;
 
-
-
-///
 }

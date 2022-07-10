@@ -2,8 +2,10 @@ package com.example.user_service.pojos.dto.user;
 
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class UserMailDTO {
     private String userName;
     private String email;
@@ -14,4 +16,5 @@ public class UserMailDTO {
         this.email = email;
         this.picPath = picPath;
     }
+
 }

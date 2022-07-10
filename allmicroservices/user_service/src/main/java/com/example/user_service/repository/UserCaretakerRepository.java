@@ -23,15 +23,12 @@ public interface UserCaretakerRepository extends JpaRepository<UserCaretaker, St
     @Query("select u from UserCaretaker u where u.reqStatus=false and u.patientId = ?1")
     List<UserCaretaker> getCaretakerRequestStatus(String id);
 
-    @Query("select u from UserCaretaker u where u.reqStatus=false and u.caretakerId = ?1")
-    List<UserCaretaker> getPatientRequestStatus(String id);
-
     @Query("select u from UserCaretaker u where u.sentBy='c' and u.patientId= ?1 and u.reqStatus=false")
     List<UserCaretaker> getCaretakerRequestsP(String userId);
 
     @Query("select u from UserCaretaker u where u.patientId=?1 and u.caretakerId=?2")
     UserCaretaker check(String patientId,String caretakerId);
 
-
+    @Query("select u from UserCaretaker u where u.cId=?1")
+    UserCaretaker getById(String cId);
 }
-///

@@ -8,8 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
@@ -17,7 +15,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Table(name = "image")
-public class Image {
+public class   Image {
 
     @Id
     @Column(name = "image_id",nullable = false)
@@ -31,22 +29,15 @@ public class Image {
     @Column(name = "date",nullable = false)
     @Temporal(TemporalType.DATE)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    @NotNull(message = "Date cannot be empty")
     private Date date;
 
     @Column(name = "time",nullable = false,length = 50)
-    @NotNull(message = "Time cannot be empty")
-    @NotEmpty(message = "Time cannot be empty")
     private String time;
 
-    @Column(name = "Caretaker_name",nullable = false,length = 60)
-    @NotEmpty(message = "Caretaker name cannot be empty")
-    @NotNull(message = "Caretaker name cannot be empty")
+    @Column(name = "caretaker_name",nullable = false,length = 60)
     private String caretakerName;
 
     @Column(name = "image_url",nullable = false,length = 100)
-    @NotNull(message = "Image url cannot be empty")
-    @NotEmpty(message = "Image url cannot be empty")
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.EAGER)

@@ -1,4 +1,4 @@
-package com.example.user_service.service;
+package com.example.user_service.service.user;
 
 import com.example.user_service.exception.UserExceptionMessage;
 import com.example.user_service.exception.UserMedicineException;
@@ -7,7 +7,7 @@ import com.example.user_service.pojos.dto.user.UserDetailEntityDTO;
 import com.example.user_service.pojos.dto.user.UserEntityDTO;
 import com.example.user_service.pojos.dto.user.UserMailDTO;
 import com.example.user_service.pojos.dto.user.UserMedicineDTO;
-import com.example.user_service.pojos.response.UserResponse;
+import com.example.user_service.pojos.response.user.UserResponse;
 import com.example.user_service.pojos.response.user.UserDetailResponsePage;
 
 import javax.mail.MessagingException;
@@ -25,15 +25,13 @@ public interface UserService {
 
      UserEntity getUserById(String userId) throws UserExceptionMessage, UserMedicineException, ExecutionException, InterruptedException;
 
-     UserEntity updateUser(String userId, UserEntityDTO userEntityDTO)throws UserExceptionMessage;
-
      List<UserEntity> getUserByName(String userName)throws UserExceptionMessage;
 
      UserMailDTO getUserByEmail1(String email) throws UserExceptionMessage;
 
      UserEntity getUserByEmail(String email) throws UserExceptionMessage;
 
-     String sendUserMedicines(Integer userId) throws MessagingException, IOException;
+     String sendUserMedicines(Integer userId) throws MessagingException, IOException, UserExceptionMessage;
 
      UserResponse login(String mail , String fcmToken) throws UserExceptionMessage;
 

@@ -8,11 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
-import com.example.user_service.model.user.UserDetails;
+
 
 //@NamedNativeQuery(name = "UserEntity.getUserById1",
 //query = "Select u.user_name as userName, u.email as email from user u where u.user_id = ?1",resultSetMapping = "Mapping.UserEntityDTO")
@@ -38,8 +36,6 @@ public class UserEntity {
   private String userId;
 
   @Column(name = "user_name",nullable = false)
-  @NotNull(message = "User name status cannot be empty")
-  @NotEmpty(message = "User name status cannot be empty")
   private String userName;
 
   @Column(name = "email",nullable = false)

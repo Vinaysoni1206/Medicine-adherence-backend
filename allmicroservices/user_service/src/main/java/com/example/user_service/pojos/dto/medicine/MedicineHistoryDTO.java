@@ -26,8 +26,7 @@ public class MedicineHistoryDTO {
 
     @NotNull(message = "Timings cannot be null")
     @NotEmpty(message = "Timings cannot be empty")
-    private String[] not_taken;
-
+    private String[] notTaken;
 
 }
 //

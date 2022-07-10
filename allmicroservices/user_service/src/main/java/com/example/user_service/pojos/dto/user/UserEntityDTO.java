@@ -1,8 +1,10 @@
 package com.example.user_service.pojos.dto.user;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class UserEntityDTO {
 
     private String userName;

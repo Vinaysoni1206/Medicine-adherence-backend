@@ -28,21 +28,14 @@ public class RabbitmqConfiguration {
 
     @Value("${project.rabbitmq.routingkey2}")
     private String routingKey2;
-
-
-
-
     @Bean(name = "queue1")
     public Queue getMailQueue(){
     return new Queue(queueName);
 }
-//
     @Bean(name = "queue2")
     public Queue getNotificationQueue(){
         return new Queue(queue2Name);
     }
-
-
     @Bean
     public TopicExchange getTopicExchange(){
         return new TopicExchange(topicExchange);

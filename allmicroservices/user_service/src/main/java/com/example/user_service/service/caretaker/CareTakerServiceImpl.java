@@ -1,7 +1,6 @@
-package com.example.user_service.service;
+package com.example.user_service.service.caretaker;
 
 
-import com.example.user_service.exception.DataAccessExceptionMessage;
 import com.example.user_service.exception.UserCaretakerException;
 import com.example.user_service.exception.UserExceptionMessage;
 import com.example.user_service.model.image.Image;
@@ -10,7 +9,7 @@ import com.example.user_service.model.medicine.UserMedicines;
 import com.example.user_service.pojos.Notificationmessage;
 import com.example.user_service.pojos.dto.UserCaretakerDTO;
 import com.example.user_service.pojos.response.ImageResponse;
-import com.example.user_service.pojos.response.responsepages.CaretakerResponsePage;
+import com.example.user_service.pojos.response.caretaker.CaretakerResponsePage;
 import com.example.user_service.repository.ImageRepository;
 import com.example.user_service.repository.UserCaretakerRepository;
 import com.example.user_service.repository.UserMedicineRepository;
@@ -21,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -62,102 +59,83 @@ public class CareTakerServiceImpl implements CareTakerService {
     @Override
     public UserCaretaker saveCareTaker(UserCaretakerDTO userCaretakerDTO) throws UserCaretakerException {
 
-        try {
+        logger.info("Saving caretaker");
             UserCaretaker userCaretaker = mapToEntity(userCaretakerDTO);
             userCaretaker.setCreatedAt(Datehelper.getcurrentdatatime());
             if (userCaretakerRepository.check(userCaretaker.getPatientId(), userCaretaker.getCaretakerId()) != null) {
-                throw new UserCaretakerException("Caretaker Already Present!!");
+                throw new UserCaretakerException(Messages.CARETAKER_ALREADY_PRESENT);
             } else {
-                return userCaretakerRepository.save(userCaretaker);
+                userCaretakerRepository.save(userCaretaker);
+                return userCaretaker;
             }
-        } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
-        }
     }
 
     @Override
     public UserCaretaker updateCaretakerStatus(String cId) throws UserCaretakerException {
-        try {
-            Optional<UserCaretaker> uc = userCaretakerRepository.findById(cId);
-            if (uc.isEmpty()) {
-                throw new UserCaretakerException("Request not found");
+        logger.info("Updating request status");
+            UserCaretaker uc = userCaretakerRepository.getById(cId);
+            if (uc.getCaretakerId()==null) {
+                throw new UserCaretakerException(Messages.NO_RECORD_FOUND);
             }
-            uc.get().setReqStatus(true);
-            return userCaretakerRepository.save(uc.get());
-        } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
-        }
+            uc.setReqStatus(true);
+            userCaretakerRepository.save(uc);
+            return uc;
     }
 
     @Override
     public CaretakerResponsePage getPatientsUnderMe(String userId, int pageNo, int pageSize) throws UserCaretakerException {
 
-        try {
+        logger.info("List of patients under me");
             Pageable pageable= PageRequest.of(pageNo,pageSize);
             Page<UserCaretaker> userCaretakerPage = userCaretakerRepository.getPatientsUnderMe(userId, pageable);
             if (userCaretakerPage.isEmpty()) {
                 throw new UserCaretakerException(Messages.DATA_NOT_FOUND);
             }
             return new CaretakerResponsePage(Messages.SUCCESS,Messages.DATA_FOUND,userCaretakerPage.getTotalElements(),userCaretakerPage.getTotalPages(),pageNo,userCaretakerPage.getContent());
-        } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
-        }
     }
 
     @Override
     public List<UserCaretaker> getPatientRequests(String userId) throws UserCaretakerException {
-        try {
+        logger.info("List of patients");
             List<UserCaretaker> userCaretaker =userCaretakerRepository.getPatientRequests(userId);
             if (userCaretaker.isEmpty()) {
                 throw new UserCaretakerException(Messages.DATA_NOT_FOUND);
             }
             return userCaretaker;
-        } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
-        }
     }
 
     @Override
     public List<UserCaretaker> getMyCaretakers(String userId) throws UserCaretakerException {
-        try {
+        logger.info("List of Caretakers");
             List<UserCaretaker> userCaretaker = userCaretakerRepository.getMyCaretakers(userId);
             if (userCaretaker.isEmpty()) {
                 throw new UserCaretakerException(Messages.DATA_NOT_FOUND);
             }
             return userCaretaker;
-        } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
-        }
     }
 
     @Override
-    public List<UserCaretaker> getCaretakerRequestStatus(String userId) {
-        try {
-            return userCaretakerRepository.getCaretakerRequestStatus(userId);
-        } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
-        }
+    public List<UserCaretaker> getCaretakerRequestStatus(String userId) throws UserCaretakerException {
+            List<UserCaretaker> userCaretakerList= userCaretakerRepository.getCaretakerRequestStatus(userId);
+            if(userCaretakerList.isEmpty()){
+                throw new UserCaretakerException(Messages.NO_RECORD_FOUND);
+            }
+            return userCaretakerList;
     }
 
 
     @Override
     public List<UserCaretaker> getCaretakerRequestsP(String userId) throws UserCaretakerException {
-        try {
             List<UserCaretaker> userCaretaker = userCaretakerRepository.getCaretakerRequestsP(userId);
             if (userCaretaker.isEmpty()) {
                 throw new UserCaretakerException(Messages.DATA_NOT_FOUND);
             }
             return userCaretaker;
-        } catch (DataAccessException dataAccessException) {
-            throw new DataAccessExceptionMessage(Messages.SQL_ERROR + dataAccessException.getMessage());
-        }
     }
 
     @Override
     public String delPatientReq(String cId) throws UserExceptionMessage, UserCaretakerException {
-
-
-        try {
+        logger.info("Delete patient request");
             Optional<UserCaretaker> userCaretaker = userCaretakerRepository.findById(cId);
             if (userCaretaker.isPresent()) {
                 userCaretakerRepository.delete(userCaretaker.get());
@@ -165,14 +143,11 @@ public class CareTakerServiceImpl implements CareTakerService {
 
             }
             throw new UserCaretakerException(Messages.NO_RECORD_FOUND);
-        } catch (Exception e) {
-            throw new UserCaretakerException(Messages.NO_RECORD_FOUND);
-        }
     }
 
     @Override
-    public ImageResponse sendImageToCaretaker(MultipartFile multipartFile, String filename, String caretakerid, String medName, Integer medId) throws IOException, UserCaretakerException {
-
+    public ImageResponse sendImageToCaretaker(MultipartFile multipartFile, String filename, String caretakerid, String medName, Integer medId) throws UserCaretakerException {
+        logger.info("Sending image to caretaker");
         try {
             File file = new File(System.getProperty("user.dir") + "/src/main/upload/static/images");
             if (!file.exists()) {
@@ -182,6 +157,9 @@ public class CareTakerServiceImpl implements CareTakerService {
             Files.write(path, multipartFile.getBytes());
 
             UserMedicines userMedicines = userMedicineRepository.getMedById(medId);
+            if(userMedicines.getUserEntity()==null){
+                throw new UserCaretakerException(Messages.DATA_NOT_FOUND);
+            }
             String userName = userMedicines.getUserEntity().getUserName();
             Image image = new Image();
             image.setImageUrl(path.getFileName().toString());
@@ -195,7 +173,7 @@ public class CareTakerServiceImpl implements CareTakerService {
 
         } catch (Exception e) {
             logger.info(e.getMessage());
-            return new ImageResponse(Messages.FAILED,Messages.UNABLE_TO_SEND);
+            return new ImageResponse(Messages.FAILED,e.getMessage());
         }
 
         return new ImageResponse(Messages.SUCCESS,Messages.SENT_SUCCESS);
@@ -205,7 +183,5 @@ public class CareTakerServiceImpl implements CareTakerService {
         return mapper.map(userCaretakerDTO, UserCaretaker.class);
 
     }
-
-///
 
 }
