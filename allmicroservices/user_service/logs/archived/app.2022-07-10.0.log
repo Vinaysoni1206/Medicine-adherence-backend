@@ -1,0 +1,43 @@
+2022-07-10 11:34:27,012 INFO com.example.user_service.service.caretaker.CareTakerServiceTest [main] Started CareTakerServiceTest in 6.253 seconds (JVM running for 7.446)
+2022-07-10 11:34:33,794 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Updating request status
+2022-07-10 11:35:15,599 INFO com.example.user_service.service.caretaker.CareTakerServiceTest [main] Starting CareTakerServiceTest using Java 11.0.15 on nineleaps-ThinkPad-E490 with PID 238423 (started by nineleaps in /home/nineleaps/Desktop/git/Medicine-adherence-backend/allmicroservices/user_service)
+2022-07-10 11:35:15,601 DEBUG com.example.user_service.service.caretaker.CareTakerServiceTest [main] Running with Spring Boot v2.6.3, Spring v5.3.15
+2022-07-10 11:35:15,602 INFO com.example.user_service.service.caretaker.CareTakerServiceTest [main] No active profile set, falling back to default profiles: default
+2022-07-10 11:35:21,645 INFO com.example.user_service.service.caretaker.CareTakerServiceTest [main] Started CareTakerServiceTest in 6.308 seconds (JVM running for 7.507)
+2022-07-10 11:35:27,660 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Updating request status
+2022-07-10 11:35:35,460 INFO com.example.user_service.service.caretaker.CareTakerServiceTest [main] Starting CareTakerServiceTest using Java 11.0.15 on nineleaps-ThinkPad-E490 with PID 238522 (started by nineleaps in /home/nineleaps/Desktop/git/Medicine-adherence-backend/allmicroservices/user_service)
+2022-07-10 11:35:35,462 DEBUG com.example.user_service.service.caretaker.CareTakerServiceTest [main] Running with Spring Boot v2.6.3, Spring v5.3.15
+2022-07-10 11:35:35,462 INFO com.example.user_service.service.caretaker.CareTakerServiceTest [main] No active profile set, falling back to default profiles: default
+2022-07-10 11:35:41,259 INFO com.example.user_service.service.caretaker.CareTakerServiceTest [main] Started CareTakerServiceTest in 6.068 seconds (JVM running for 7.68)
+2022-07-10 11:35:41,945 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Updating request status
+2022-07-10 11:36:03,722 INFO com.example.user_service.exception.UserExceptionsTest [main] Starting UserExceptionsTest using Java 11.0.15 on nineleaps-ThinkPad-E490 with PID 238662 (started by nineleaps in /home/nineleaps/Desktop/git/Medicine-adherence-backend/allmicroservices/user_service)
+2022-07-10 11:36:03,724 DEBUG com.example.user_service.exception.UserExceptionsTest [main] Running with Spring Boot v2.6.3, Spring v5.3.15
+2022-07-10 11:36:03,724 INFO com.example.user_service.exception.UserExceptionsTest [main] No active profile set, falling back to default profiles: default
+2022-07-10 11:36:11,779 INFO com.example.user_service.exception.UserExceptionsTest [main] Started UserExceptionsTest in 8.497 seconds (JVM running for 16.065)
+2022-07-10 11:36:12,198 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Sending image to caretaker
+2022-07-10 11:36:12,208 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Saving caretaker
+2022-07-10 11:36:12,222 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Delete patient request
+2022-07-10 11:36:12,228 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of Caretakers
+2022-07-10 11:36:12,240 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Updating request status
+2022-07-10 11:36:12,263 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients under me
+2022-07-10 11:36:12,269 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients
+2022-07-10 11:36:12,275 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients under me
+2022-07-10 11:36:12,281 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of Caretakers
+2022-07-10 11:36:12,298 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Saving caretaker
+2022-07-10 11:36:12,303 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Updating request status
+2022-07-10 11:36:12,309 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients
+2022-07-10 11:36:12,315 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Sending image to caretaker
+2022-07-10 11:36:12,315 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Data not found
+2022-07-10 11:36:12,320 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Delete patient request
+2022-07-10 11:36:12,425 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:36:12,444 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:36:12,455 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:36:12,484 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:36:12,489 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:36:12,495 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:36:12,518 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:36:12,522 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:36:12,526 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:37:37,984 INFO com.example.user_service.exception.UserExceptionsTest [main] Starting UserExceptionsTest using Java 11.0.15 on nineleaps-ThinkPad-E490 with PID 238955 (started by nineleaps in /home/nineleaps/Desktop/git/Medicine-adherence-backend/allmicroservices/user_service)
+2022-07-10 11:37:37,986 DEBUG com.example.user_service.exception.UserExceptionsTest [main] Running with Spring Boot v2.6.3, Spring v5.3.15
+2022-07-10 11:37:37,987 INFO com.example.user_service.exception.UserExceptionsTest [main] No active profile set, falling back to default profiles: default

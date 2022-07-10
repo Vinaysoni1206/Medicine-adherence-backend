@@ -1,0 +1,56 @@
+2022-07-10 11:37:46,476 INFO com.example.user_service.exception.UserExceptionsTest [main] Started UserExceptionsTest in 8.969 seconds (JVM running for 15.116)
+2022-07-10 11:37:46,940 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Sending image to caretaker
+2022-07-10 11:37:46,950 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Saving caretaker
+2022-07-10 11:37:46,965 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Delete patient request
+2022-07-10 11:37:46,971 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of Caretakers
+2022-07-10 11:37:46,983 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Updating request status
+2022-07-10 11:37:46,994 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients under me
+2022-07-10 11:37:47,000 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients
+2022-07-10 11:37:47,006 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients under me
+2022-07-10 11:37:47,011 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of Caretakers
+2022-07-10 11:37:47,028 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Saving caretaker
+2022-07-10 11:37:47,033 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Updating request status
+2022-07-10 11:37:47,041 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients
+2022-07-10 11:37:47,048 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Sending image to caretaker
+2022-07-10 11:37:47,049 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Data not found
+2022-07-10 11:37:47,056 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Delete patient request
+2022-07-10 11:37:47,181 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:37:47,202 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:37:47,215 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:37:47,249 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:37:47,257 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:37:47,265 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:37:47,297 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:37:47,303 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:37:47,310 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:38:06,132 INFO com.example.user_service.exception.UserExceptionsTest [main] Starting UserExceptionsTest using Java 11.0.15 on nineleaps-ThinkPad-E490 with PID 239118 (started by nineleaps in /home/nineleaps/Desktop/git/Medicine-adherence-backend/allmicroservices/user_service)
+2022-07-10 11:38:06,134 DEBUG com.example.user_service.exception.UserExceptionsTest [main] Running with Spring Boot v2.6.3, Spring v5.3.15
+2022-07-10 11:38:06,134 INFO com.example.user_service.exception.UserExceptionsTest [main] No active profile set, falling back to default profiles: default
+2022-07-10 11:38:14,372 INFO com.example.user_service.exception.UserExceptionsTest [main] Started UserExceptionsTest in 8.748 seconds (JVM running for 15.717)
+2022-07-10 11:38:14,829 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Sending image to caretaker
+2022-07-10 11:38:14,838 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Saving caretaker
+2022-07-10 11:38:14,853 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Delete patient request
+2022-07-10 11:38:14,860 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of Caretakers
+2022-07-10 11:38:14,872 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Updating request status
+2022-07-10 11:38:14,883 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients under me
+2022-07-10 11:38:14,889 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients
+2022-07-10 11:38:14,896 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients under me
+2022-07-10 11:38:14,902 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of Caretakers
+2022-07-10 11:38:14,919 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Saving caretaker
+2022-07-10 11:38:14,925 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Updating request status
+2022-07-10 11:38:14,932 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients
+2022-07-10 11:38:14,938 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Sending image to caretaker
+2022-07-10 11:38:14,939 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Data not found
+2022-07-10 11:38:14,945 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Delete patient request
+2022-07-10 11:38:15,037 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:38:15,052 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:38:15,062 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:38:15,085 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:38:15,091 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:38:15,096 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:38:15,118 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:38:15,123 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:38:15,127 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-10 11:55:30,074 INFO com.example.user_service.exception.UserExceptionsTest [main] Starting UserExceptionsTest using Java 11.0.15 on nineleaps-ThinkPad-E490 with PID 241203 (started by nineleaps in /home/nineleaps/Desktop/git/Medicine-adherence-backend/allmicroservices/user_service)
+2022-07-10 11:55:30,077 DEBUG com.example.user_service.exception.UserExceptionsTest [main] Running with Spring Boot v2.6.3, Spring v5.3.15
+2022-07-10 11:55:30,077 INFO com.example.user_service.exception.UserExceptionsTest [main] No active profile set, falling back to default profiles: default
