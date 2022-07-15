@@ -1,0 +1,11 @@
+CREATE TABLE user1 (
+  `user_id` VARCHAR(40) NOT NULL,
+  `user_name` VARCHAR(100) NOT NULL,
+  `email` VARCHAR(100) NOT NULL,
+  `last_login` VARCHAR(40) NULL DEFAULT NULL,
+  `created_at` DATETIME NULL DEFAULT NULL,
+  `contact` BIGINT(12) NULL,
+  PRIMARY KEY (`user_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci

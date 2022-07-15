@@ -1,0 +1,44 @@
+2022-07-15 10:49:25,759 INFO com.example.user_service.security.AuthenticationHandlerTest [main] Started AuthenticationHandlerTest in 6.685 seconds (JVM running for 8.252)
+2022-07-15 10:49:26,174 INFO com.example.user_service.security.AuthenticationHandler [main] 73578dfd-e7c9-4381-a348-113e72d80fa2
+2022-07-15 10:49:26,175 INFO com.example.user_service.security.AuthenticationHandler [main] null
+2022-07-15 10:49:26,204 INFO com.example.user_service.security.AuthenticationHandler [main] 73578dfd-e7c9-4381-a348-113e72d80fa2
+2022-07-15 10:49:26,205 INFO com.example.user_service.security.AuthenticationHandler [main] Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJoYXJzaGl0LnJhajEwYUBnbWFpbC5jb20iLCJleHAiOjE2NTE4ODI2MjQsImlhdCI6MTY1MTUyMjYyNH0.hsMnTM5-k4JWnfMdT7i95Xc1kTHKvtClF1A0OGzigPo
+2022-07-15 10:49:26,205 INFO com.example.user_service.security.AuthenticationHandler [main] vinay
+2022-07-15 10:49:26,205 INFO com.example.user_service.security.AuthenticationHandler [main] null
+2022-07-15 10:49:26,216 INFO com.example.user_service.security.AuthenticationHandler [main] 73578dfd-e7c9-4381-a348-113e72d80fa2
+2022-07-15 10:49:26,216 INFO com.example.user_service.security.AuthenticationHandler [main] Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJoYXJzaGl0LnJhajEwYUBnbWFpbC5jb20iLCJleHAiOjE2NTE4ODI2MjQsImlhdCI6MTY1MTUyMjYyNH0.hsMnTM5-k4JWnfMdT7i95Xc1kTHKvtClF1A0OGzigPo
+2022-07-15 10:49:26,217 INFO com.example.user_service.security.AuthenticationHandler [main] vinay
+2022-07-15 10:49:26,217 INFO com.example.user_service.security.AuthenticationHandler [main] expired
+2022-07-15 10:49:26,226 INFO com.example.user_service.security.AuthenticationHandler [main] 73578dfd-e7c9-4381-a348-113e72d80fa2
+2022-07-15 10:49:26,226 INFO com.example.user_service.security.AuthenticationHandler [main] Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJoYXJzaGl0LnJhajEwYUBnbWFpbC5jb20iLCJleHAiOjE2NTE4ODI2MjQsImlhdCI6MTY1MTUyMjYyNH0.hsMnTM5-k4JWnfMdT7i95Xc1kTHKvtClF1A0OGzigPo
+2022-07-15 10:49:26,226 INFO com.example.user_service.security.AuthenticationHandler [main] vinay
+2022-07-15 10:49:26,236 INFO com.example.user_service.security.AuthenticationHandler [main] 73578dfd-e7c9-4381-a348-113e72d80fa2
+2022-07-15 10:49:26,236 INFO com.example.user_service.security.AuthenticationHandler [main] Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJoYXJzaGl0LnJhajEwYUBnbWFpbC5jb20iLCJleHAiOjE2NTE4ODI2MjQsImlhdCI6MTY1MTUyMjYyNH0.hsMnTM5-k4JWnfMdT7i95Xc1kTHKvtClF1A0OGzigPo
+2022-07-15 10:49:26,237 INFO com.example.user_service.security.AuthenticationHandler [main] null
+2022-07-15 10:49:26,247 INFO com.example.user_service.security.AuthenticationHandler [main] 73578dfd-e7c9-4381-a348-113e72d80fa2
+2022-07-15 10:49:26,248 INFO com.example.user_service.security.AuthenticationHandler [main] Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJoYXJzaGl0LnJhajEwYUBnbWFpbC5jb20iLCJleHAiOjE2NTE4ODI2MjQsImlhdCI6MTY1MTUyMjYyNH0.hsMnTM5-k4JWnfMdT7i95Xc1kTHKvtClF1A0OGzigPo
+2022-07-15 10:49:26,248 ERROR com.example.user_service.security.AuthenticationHandler [main] null
+2022-07-15 10:49:26,258 INFO com.example.user_service.security.AuthenticationHandler [main] 73578dfd-e7c9-4381-a348-113e72d80fa2
+2022-07-15 10:49:26,258 INFO com.example.user_service.security.AuthenticationHandler [main] Beare eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJoYXJzaGl0LnJhajEwYUBnbWFpbC5jb20iLCJleHAiOjE2NTE4ODI2MjQsImlhdCI6MTY1MTUyMjYyNH0.hsMnTM5-k4JWnfMdT7i95Xc1kTHKvtClF1A0OGzigPo
+2022-07-15 10:49:26,268 INFO com.example.user_service.security.AuthenticationHandler [main] 73578dfd-e7c9-4381-a348-113e72d80fa2
+2022-07-15 10:49:26,268 INFO com.example.user_service.security.AuthenticationHandler [main] Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJoYXJzaGl0LnJhajEwYUBnbWFpbC5jb20iLCJleHAiOjE2NTE4ODI2MjQsImlhdCI6MTY1MTUyMjYyNH0.hsMnTM5-k4JWnfMdT7i95Xc1kTHKvtClF1A0OGzigPo
+2022-07-15 10:49:26,268 INFO com.example.user_service.security.AuthenticationHandler [main] vinay
+2022-07-15 10:49:26,839 INFO com.example.user_service.controller.CaretakerController [main] sending image
+2022-07-15 10:49:27,175 INFO com.example.user_service.util.JwtUtil [main] Generating token
+2022-07-15 10:49:27,549 INFO com.example.user_service.util.JwtUtil [main] Validating token
+2022-07-15 10:49:27,560 INFO com.example.user_service.util.JwtUtil [main] Generating token
+2022-07-15 10:49:27,564 INFO com.example.user_service.util.JwtUtil [main] Generating token
+2022-07-15 10:49:27,567 INFO com.example.user_service.util.JwtUtil [main] Generating token
+2022-07-15 10:49:27,570 INFO com.example.user_service.util.JwtUtil [main] Generating token
+2022-07-15 10:49:27,738 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Sending image to caretaker
+2022-07-15 10:49:27,749 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Saving caretaker
+2022-07-15 10:49:27,765 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Delete patient request
+2022-07-15 10:49:27,773 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of Caretakers
+2022-07-15 10:49:27,788 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Updating request status
+2022-07-15 10:49:27,809 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients under me
+2022-07-15 10:49:27,819 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients
+2022-07-15 10:49:27,840 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients under me
+2022-07-15 10:49:27,852 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of Caretakers
+2022-07-15 10:49:27,887 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Saving caretaker
+2022-07-15 10:49:27,895 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Updating request status
+2022-07-15 10:49:27,904 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients
