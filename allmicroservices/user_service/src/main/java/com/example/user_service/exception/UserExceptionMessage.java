@@ -5,9 +5,8 @@ package com.example.user_service.exception;
  */
 public class UserExceptionMessage extends Exception{
 
-     public UserExceptionMessage(String errorMessage){
+     public UserExceptionMessage(final String errorMessage){
          super(errorMessage);
      }
 
 }
-//

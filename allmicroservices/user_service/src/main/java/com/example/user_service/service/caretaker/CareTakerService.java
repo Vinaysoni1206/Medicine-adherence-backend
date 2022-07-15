@@ -29,6 +29,5 @@ public interface CareTakerService {
 
      String delPatientReq(String cId) throws UserExceptionMessage, UserCaretakerException;
 
-     ImageResponse sendImageToCaretaker(MultipartFile multipartFile , String filename , String caretakerId , String medName, Integer medId) throws IOException , UserCaretakerException;
+     ImageResponse sendImageToCaretaker(MultipartFile multipartFile , String filename , String medName,String caretakerId ,  Integer medId) throws IOException , UserCaretakerException;
 }
-//

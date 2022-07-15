@@ -2,8 +2,6 @@ package com.example.user_service.controller;
 
 
 import com.example.user_service.exception.UserMedicineException;
-import com.example.user_service.model.medicine.UserMedicines;
-import com.example.user_service.model.user.UserEntity;
 import com.example.user_service.pojos.dto.medicine.MedicineHistoryDTO;
 
 import com.example.user_service.pojos.dto.medicine.MedicinePojo;
@@ -26,7 +24,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/api/v1/")

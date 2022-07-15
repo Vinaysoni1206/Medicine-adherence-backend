@@ -14,7 +14,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "user_details")
+@Table(name = "user_details",indexes = @Index(name = "inedx_fn",columnList = "userdet_id,user_user_id"))
 @ToString(exclude = "")
 public class UserDetails {
     @Id

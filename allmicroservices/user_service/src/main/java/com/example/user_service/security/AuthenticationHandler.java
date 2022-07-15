@@ -1,12 +1,11 @@
 package com.example.user_service.security;
 
-import com.example.user_service.config.filter.UserDetailService;
-import com.example.user_service.repository.UserRepository;
 import com.example.user_service.util.JwtUtil;
+import com.example.user_service.util.Messages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -16,19 +15,23 @@ import javax.servlet.http.HttpServletResponse;
 @Service
 public class AuthenticationHandler implements HandlerInterceptor {
 
-    @Autowired
     JwtUtil jwtUtil;
-
-    @Autowired
-    UserDetailService userDetailService;
-    @Autowired
-    UserRepository userRepository;
-
+    UserDetailsService userDetailService;
     Logger logger = LoggerFactory.getLogger(AuthenticationHandler.class);
+
+    public AuthenticationHandler(UserDetailsService userDetailsService, JwtUtil jwtUtil) {
+        this.userDetailService = userDetailsService;
+        this.jwtUtil= jwtUtil;
+    }
+
+    public AuthenticationHandler() {
+
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
+        logger.info(Messages.LoggerConstants.STARTING_METHOD_EXECUTION);
         final String authorizationHeader = request.getHeader("Authorization");
 
         String jwt = null;
@@ -50,10 +53,11 @@ public class AuthenticationHandler implements HandlerInterceptor {
             try {
 
                 UserDetails userDetails = userDetailService.loadUserByUsername(id);
-                if (Boolean.FALSE.equals(jwtUtil.validateToken(jwt.trim(), userDetails,request))) {
+                if (Boolean.FALSE.equals(jwtUtil.validateToken(jwt.trim(), userDetails))) {
                     if (request.getAttribute("expired").equals("true")) {
                         logger.info("expired");
                         response.setStatus(401);
+                        logger.info(Messages.LoggerConstants.EXITING_METHOD_EXECUTION);
                         return false;
                     }
                     response.setStatus(403);
@@ -61,6 +65,7 @@ public class AuthenticationHandler implements HandlerInterceptor {
                 } else {
                     logger.info(userDetails.getUsername());
                     response.setHeader("jwt",jwt);
+                    logger.info(Messages.LoggerConstants.EXITING_METHOD_EXECUTION);
                     return true;
 
                 }
@@ -72,11 +77,13 @@ public class AuthenticationHandler implements HandlerInterceptor {
                         "}";
                 response.setContentType("application/json");
                 response.getWriter().write(content);
+                logger.info(Messages.LoggerConstants.EXITING_METHOD_EXECUTION);
                 return false;
             }
 
         }
         response.setStatus(401);
+        logger.info(Messages.LoggerConstants.EXITING_METHOD_EXECUTION);
         return false;
     }
 }

@@ -1,53 +1,21 @@
-2022-07-10 11:55:39,757 INFO com.example.user_service.exception.UserExceptionsTest [main] Started UserExceptionsTest in 10.125 seconds (JVM running for 16.277)
-2022-07-10 11:55:40,262 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Sending image to caretaker
-2022-07-10 11:55:40,272 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Saving caretaker
-2022-07-10 11:55:40,287 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Delete patient request
-2022-07-10 11:55:40,293 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of Caretakers
-2022-07-10 11:55:40,304 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Updating request status
-2022-07-10 11:55:40,314 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients under me
-2022-07-10 11:55:40,320 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients
-2022-07-10 11:55:40,325 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients under me
-2022-07-10 11:55:40,331 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of Caretakers
-2022-07-10 11:55:40,347 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Saving caretaker
-2022-07-10 11:55:40,353 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Updating request status
-2022-07-10 11:55:40,359 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients
-2022-07-10 11:55:40,365 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Sending image to caretaker
-2022-07-10 11:55:40,365 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Data not found
-2022-07-10 11:55:40,371 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Delete patient request
-2022-07-10 11:55:40,465 INFO com.example.user_service.service.user.UserServiceImpl [main] main
-2022-07-10 11:55:40,482 INFO com.example.user_service.service.user.UserServiceImpl [main] main
-2022-07-10 11:55:40,492 INFO com.example.user_service.service.user.UserServiceImpl [main] main
-2022-07-10 11:55:40,528 INFO com.example.user_service.service.user.UserServiceImpl [main] main
-2022-07-10 11:55:40,535 INFO com.example.user_service.service.user.UserServiceImpl [main] main
-2022-07-10 11:55:40,542 INFO com.example.user_service.service.user.UserServiceImpl [main] main
-2022-07-10 11:55:40,575 INFO com.example.user_service.service.user.UserServiceImpl [main] main
-2022-07-10 11:55:40,581 INFO com.example.user_service.service.user.UserServiceImpl [main] main
-2022-07-10 11:55:40,587 INFO com.example.user_service.service.user.UserServiceImpl [main] main
-2022-07-10 11:56:22,035 INFO com.example.user_service.exception.UserExceptionsTest [main] Starting UserExceptionsTest using Java 11.0.15 on nineleaps-ThinkPad-E490 with PID 241434 (started by nineleaps in /home/nineleaps/Desktop/git/Medicine-adherence-backend/allmicroservices/user_service)
-2022-07-10 11:56:22,038 DEBUG com.example.user_service.exception.UserExceptionsTest [main] Running with Spring Boot v2.6.3, Spring v5.3.15
-2022-07-10 11:56:22,038 INFO com.example.user_service.exception.UserExceptionsTest [main] No active profile set, falling back to default profiles: default
-2022-07-10 11:56:31,313 INFO com.example.user_service.exception.UserExceptionsTest [main] Started UserExceptionsTest in 9.769 seconds (JVM running for 16.104)
-2022-07-10 11:56:32,016 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Sending image to caretaker
-2022-07-10 11:56:32,028 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Saving caretaker
-2022-07-10 11:56:32,043 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Delete patient request
-2022-07-10 11:56:32,049 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of Caretakers
-2022-07-10 11:56:32,062 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Updating request status
-2022-07-10 11:56:32,074 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients under me
-2022-07-10 11:56:32,081 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients
-2022-07-10 11:56:32,088 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients under me
-2022-07-10 11:56:32,094 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of Caretakers
-2022-07-10 11:56:32,113 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Saving caretaker
-2022-07-10 11:56:32,120 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Updating request status
-2022-07-10 11:56:32,126 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] List of patients
-2022-07-10 11:56:32,132 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Sending image to caretaker
-2022-07-10 11:56:32,133 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Data not found
-2022-07-10 11:56:32,139 INFO com.example.user_service.service.caretaker.CareTakerServiceImpl [main] Delete patient request
-2022-07-10 11:56:32,235 INFO com.example.user_service.service.user.UserServiceImpl [main] main
-2022-07-10 11:56:32,251 INFO com.example.user_service.service.user.UserServiceImpl [main] main
-2022-07-10 11:56:32,262 INFO com.example.user_service.service.user.UserServiceImpl [main] main
-2022-07-10 11:56:32,289 INFO com.example.user_service.service.user.UserServiceImpl [main] main
-2022-07-10 11:56:32,295 INFO com.example.user_service.service.user.UserServiceImpl [main] main
-2022-07-10 11:56:32,301 INFO com.example.user_service.service.user.UserServiceImpl [main] main
-2022-07-10 11:56:32,333 INFO com.example.user_service.service.user.UserServiceImpl [main] main
-2022-07-10 11:56:32,339 INFO com.example.user_service.service.user.UserServiceImpl [main] main
-2022-07-10 11:56:32,344 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-15 10:52:00,574 INFO com.example.user_service.security.AuthenticationHandler [main] vinay
+2022-07-15 10:52:00,584 INFO com.example.user_service.security.AuthenticationHandler [main] 73578dfd-e7c9-4381-a348-113e72d80fa2
+2022-07-15 10:52:00,584 INFO com.example.user_service.security.AuthenticationHandler [main] Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJoYXJzaGl0LnJhajEwYUBnbWFpbC5jb20iLCJleHAiOjE2NTE4ODI2MjQsImlhdCI6MTY1MTUyMjYyNH0.hsMnTM5-k4JWnfMdT7i95Xc1kTHKvtClF1A0OGzigPo
+2022-07-15 10:52:00,584 INFO com.example.user_service.security.AuthenticationHandler [main] null
+2022-07-15 10:52:00,593 INFO com.example.user_service.security.AuthenticationHandler [main] 73578dfd-e7c9-4381-a348-113e72d80fa2
+2022-07-15 10:52:00,593 INFO com.example.user_service.security.AuthenticationHandler [main] Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJoYXJzaGl0LnJhajEwYUBnbWFpbC5jb20iLCJleHAiOjE2NTE4ODI2MjQsImlhdCI6MTY1MTUyMjYyNH0.hsMnTM5-k4JWnfMdT7i95Xc1kTHKvtClF1A0OGzigPo
+2022-07-15 10:52:00,593 ERROR com.example.user_service.security.AuthenticationHandler [main] null
+2022-07-15 10:52:00,599 INFO com.example.user_service.security.AuthenticationHandler [main] 73578dfd-e7c9-4381-a348-113e72d80fa2
+2022-07-15 10:52:00,599 INFO com.example.user_service.security.AuthenticationHandler [main] Beare eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJoYXJzaGl0LnJhajEwYUBnbWFpbC5jb20iLCJleHAiOjE2NTE4ODI2MjQsImlhdCI6MTY1MTUyMjYyNH0.hsMnTM5-k4JWnfMdT7i95Xc1kTHKvtClF1A0OGzigPo
+2022-07-15 10:52:00,606 INFO com.example.user_service.security.AuthenticationHandler [main] 73578dfd-e7c9-4381-a348-113e72d80fa2
+2022-07-15 10:52:00,606 INFO com.example.user_service.security.AuthenticationHandler [main] Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJoYXJzaGl0LnJhajEwYUBnbWFpbC5jb20iLCJleHAiOjE2NTE4ODI2MjQsImlhdCI6MTY1MTUyMjYyNH0.hsMnTM5-k4JWnfMdT7i95Xc1kTHKvtClF1A0OGzigPo
+2022-07-15 10:52:00,606 INFO com.example.user_service.security.AuthenticationHandler [main] vinay
+2022-07-15 10:52:00,697 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-15 10:52:00,715 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-15 10:52:00,726 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-15 10:52:00,753 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-15 10:52:00,762 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-15 10:52:00,767 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-15 10:52:00,794 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-15 10:52:00,798 INFO com.example.user_service.service.user.UserServiceImpl [main] main
+2022-07-15 10:52:00,803 INFO com.example.user_service.service.user.UserServiceImpl [main] main

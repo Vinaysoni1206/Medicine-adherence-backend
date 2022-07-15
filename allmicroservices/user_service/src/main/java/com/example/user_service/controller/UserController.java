@@ -16,6 +16,8 @@ import com.example.user_service.pojos.response.user.UserMailResponse;
 import com.example.user_service.service.user.UserService;
 import com.example.user_service.util.JwtUtil;
 import com.example.user_service.util.Messages;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,7 +27,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -49,11 +50,12 @@ public class UserController {
         this.jwtUtil=jwtUtil;
     }
 
+    private final Logger logger= LoggerFactory.getLogger(UserController.class);
     // saving the user when they signup
     @Retryable(maxAttempts = 4)// retrying up to 4 times
     @PostMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> saveUser(@NotBlank @NotNull @RequestParam(name = "fcmToken") String fcmToken, @NotBlank @NotNull @RequestParam(name = "picPath") String picPath, @Valid @RequestBody UserEntityDTO userEntityDTO) throws UserExceptionMessage{
-
+        logger.info("Saving User : {}",userEntityDTO);
         return new ResponseEntity<>(userService.saveUser(userEntityDTO, fcmToken, picPath), HttpStatus.CREATED);
 
 
@@ -61,9 +63,8 @@ public class UserController {
 
     @GetMapping(value = "/refreshToken",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> refreshToken(@NotBlank @NotNull @RequestParam(name = "uid") String uid) throws UserExceptionMessage, UserMedicineException, ExecutionException, InterruptedException {
-
+        logger.info("Generating refresh token");
         String jwtToken = jwtUtil.generateToken(userService.getUserById(uid).getUserName());
-
         return new ResponseEntity<>(jwtToken, HttpStatus.CREATED);
 
     }
@@ -71,7 +72,7 @@ public class UserController {
     @Retryable(maxAttempts = 4)// retrying up to 4 times
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> login(@Valid @RequestBody LoginDTO loginDTO) throws UserExceptionMessage {
-
+        logger.info("Loging the user : {}",loginDTO);
         return new ResponseEntity<>(userService.login(loginDTO.getEmail(),loginDTO.getFcmToken()), HttpStatus.OK);
 
 
@@ -84,7 +85,7 @@ public class UserController {
     public ResponseEntity<UserDetailResponsePage> getUsers(@RequestParam(defaultValue = "1") int pageNo,
                                                            @RequestParam(defaultValue = "3") int pageSize) throws UserExceptionMessage, ExecutionException, InterruptedException {
 
-
+        logger.info("Fetching all users");
         return new ResponseEntity<>(userService.getUsers(pageNo,pageSize).get(), HttpStatus.OK);
 
 
@@ -95,10 +96,9 @@ public class UserController {
     @GetMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserProfileResponse> getUserById(@NotBlank @NotNull @RequestParam("userId") String userId) throws UserExceptionMessage, UserMedicineException, ExecutionException, InterruptedException {
 
-
+        logger.info("Fetching user by Id : {}",userId);
         UserDetailEntityDTO user = userService.getUserById1(userId);
         List<UserMedicineDTO> list = userService.getUserMedicineById(userId);
-
         UserProfileResponse userProfileResponse = new UserProfileResponse(Messages.SUCCESS,Messages.DATA_FOUND, user, list);
         return new ResponseEntity<>(userProfileResponse, HttpStatus.OK);
 
@@ -111,9 +111,10 @@ public class UserController {
     public ResponseEntity<UserMailResponse> getUserByEmail(@NotBlank @NotNull @RequestParam("email") String email
             , @RequestParam("sender") String sender)
             throws UserExceptionMessage {
-
+        logger.info("Fetching a user by mail : {}",email);
         UserMailDTO userEntity = userService.getUserByEmail1(email);
         if (userEntity == null) {
+            logger.info("Sending mail if email is not present : {}",email);
             rabbitTemplate.convertAndSend("project_exchange",
                     "mail_key", new MailInfo(email, "Please join", "patient_request", sender));
             return new ResponseEntity<>(new UserMailResponse(Messages.DATA_NOT_FOUND,"Invitation sent to user with given email id!", null),HttpStatus.OK);
@@ -127,9 +128,7 @@ public class UserController {
     @Retryable(maxAttempts = 4)// retrying up to 4 times
     @GetMapping(value = "/pdf",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> sendPdf(@NotBlank @NotNull @RequestParam(name = "medId") Integer medId) throws IOException, MessagingException, UserExceptionMessage {
-        if(userService.sendUserMedicines(medId).equals(Messages.DATA_NOT_FOUND)){
-           throw new UserExceptionMessage(Messages.MEDICINE_NOT_FOUND);
-       }
+        logger.info("Generating PDF file for a particular medId :{}",medId);
         String filePath = userService.sendUserMedicines(medId);
         UserResponse userResponse = new UserResponse(Messages.SUCCESS, filePath, null, "", "");
         return new ResponseEntity<>(userResponse, HttpStatus.OK);

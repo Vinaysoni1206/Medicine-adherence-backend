@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MedicinePojo {
-
     private int userId;
     private String days;
     private int currentCount;

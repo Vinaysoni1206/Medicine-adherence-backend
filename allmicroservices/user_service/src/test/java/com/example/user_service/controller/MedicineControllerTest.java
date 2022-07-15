@@ -1,14 +1,13 @@
 package com.example.user_service.controller;
 
-import com.example.user_service.model.medicine.MedicineHistory;
 import com.example.user_service.model.user.UserEntity;
 import com.example.user_service.pojos.dto.medicine.MedicineHistoryDTO;
 import com.example.user_service.pojos.dto.medicine.MedicinePojo;
-import com.example.user_service.repository.UserRepository;
 import com.example.user_service.service.medicine.UserMedicineService;
 import com.example.user_service.util.Messages;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
@@ -27,8 +26,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 class MedicineControllerTest {
 
@@ -41,9 +38,6 @@ class MedicineControllerTest {
 
     @Mock
     UserMedicineService userMedicineService;
-
-    @Mock
-    UserRepository userRepository;
 
     @BeforeEach
     public void setUp(){
@@ -58,6 +52,7 @@ class MedicineControllerTest {
 
     @Test
     @ExtendWith(MockitoExtension.class)
+    @DisplayName("Test for syncing data - POST")
     void syncData() throws  Exception{
         medicinePojoList.add(medicinePojo);
         Mockito.when(userMedicineService.syncData("73578dfd-e7c9-4381-a348-113e72d80fa2",medicinePojoList)).thenReturn(Messages.SUCCESS);
@@ -71,6 +66,7 @@ class MedicineControllerTest {
 
     @Test
     @ExtendWith(MockitoExtension.class)
+    @DisplayName("Test for syncing medicine history - POST")
     void syncMedicineHistory() throws Exception{
         String[] timing= new String[4];
         timing[0]="10:00 AM";
@@ -92,6 +88,7 @@ class MedicineControllerTest {
 
     @Test
     @ExtendWith(MockitoExtension.class)
+    @DisplayName("Test for fetching user medicine history - GET")
     void getMedicineHistories() throws Exception{
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/api/v1/medicine-histories?medId=123")
@@ -101,6 +98,7 @@ class MedicineControllerTest {
 
     @Test
     @ExtendWith(MockitoExtension.class)
+    @DisplayName("Test for fetching user medicine images - GET")
     void getMedicineImages() throws Exception{
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/api/v1/medicine-images?medId=123")

@@ -8,6 +8,7 @@ import com.example.user_service.pojos.Notificationmessage;
 import com.example.user_service.pojos.dto.SendImageDto;
 import com.example.user_service.pojos.dto.UserCaretakerDTO;
 import com.example.user_service.pojos.response.caretaker.CaretakerDelete;
+import com.example.user_service.pojos.response.caretaker.CaretakerListResponse;
 import com.example.user_service.pojos.response.caretaker.CaretakerResponse;
 import com.example.user_service.pojos.response.ImageResponse;
 import com.example.user_service.pojos.response.caretaker.CaretakerResponsePage;
@@ -88,9 +89,9 @@ public class CaretakerController {
     // fetch all the request sent by a patients to a caretaker
     @Retryable(maxAttempts = 4)// retrying up to 4 times
     @GetMapping(value = "/patient/requests",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CaretakerDelete.CaretakerListResponse> getPatientRequestsC(@NotNull @NotBlank @RequestParam(name = "caretakerId") String userId) throws UserCaretakerException {
+    public ResponseEntity<CaretakerListResponse> getPatientRequestsC(@NotNull @NotBlank @RequestParam(name = "caretakerId") String userId) throws UserCaretakerException {
         List<UserCaretaker> userCaretakerList = careTakerService.getPatientRequests(userId);
-        CaretakerDelete.CaretakerListResponse caretakerResponse1 = new CaretakerDelete.CaretakerListResponse(Messages.SUCCESS, Messages.DATA_FOUND, userCaretakerList);
+        CaretakerListResponse caretakerResponse1 = new CaretakerListResponse(Messages.SUCCESS, Messages.DATA_FOUND, userCaretakerList);
         return new ResponseEntity<>(caretakerResponse1, HttpStatus.OK);
 
     }
@@ -98,9 +99,9 @@ public class CaretakerController {
     // where the patients can view all his caretakers
     @Retryable(maxAttempts = 4)// retrying up to 4 times
     @GetMapping(value = "/caretakers",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CaretakerDelete.CaretakerListResponse> getMyCaretakers(@NotNull @NotBlank @RequestParam(name = "patientId") String userId) throws UserCaretakerException {
+    public ResponseEntity<CaretakerListResponse> getMyCaretakers(@NotNull @NotBlank @RequestParam(name = "patientId") String userId) throws UserCaretakerException {
         List<UserCaretaker> userCaretakerList = careTakerService.getMyCaretakers(userId);
-        CaretakerDelete.CaretakerListResponse caretakerResponse1 = new CaretakerDelete.CaretakerListResponse(Messages.SUCCESS, Messages.DATA_FOUND, userCaretakerList);
+        CaretakerListResponse caretakerResponse1 = new CaretakerListResponse(Messages.SUCCESS, Messages.DATA_FOUND, userCaretakerList);
         return new ResponseEntity<>(caretakerResponse1, HttpStatus.OK);
     }
 
@@ -108,9 +109,9 @@ public class CaretakerController {
 
     @Retryable(maxAttempts = 4)// retrying up to 4 times
     @GetMapping(value = "/caretaker/requests",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CaretakerDelete.CaretakerListResponse> getCaretakerRequestsP(@NotNull @NotBlank @RequestParam(name = "patientId") String userId) throws UserCaretakerException {
+    public ResponseEntity<CaretakerListResponse> getCaretakerRequestsP(@NotNull @NotBlank @RequestParam(name = "patientId") String userId) throws UserCaretakerException {
         List<UserCaretaker> userCaretakerList = careTakerService.getCaretakerRequestsP(userId);
-        CaretakerDelete.CaretakerListResponse caretakerResponse1 = new CaretakerDelete.CaretakerListResponse(Messages.SUCCESS, Messages.DATA_FOUND, userCaretakerList);
+        CaretakerListResponse caretakerResponse1 = new CaretakerListResponse(Messages.SUCCESS, Messages.DATA_FOUND, userCaretakerList);
         return new ResponseEntity<>(caretakerResponse1, HttpStatus.OK);
 
     }
@@ -143,5 +144,5 @@ public class CaretakerController {
         return new ResponseEntity<>(imageResponse,HttpStatus.OK);
     }
 
-////
+
 }

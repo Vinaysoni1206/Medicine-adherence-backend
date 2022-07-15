@@ -21,9 +21,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "user")
-@NamedEntityGraph(name="userDetail_graph" ,
-        attributeNodes = @NamedAttributeNode(value = "userDetails"))
+@Table(name = "user",
+        indexes = @Index(name = "inedx_fn",columnList = "user_id"))
+@NamedEntityGraph(name="userDetail_graph" , attributeNodes = @NamedAttributeNode(value = "userDetails"))
 public class UserEntity {
 
   @Id

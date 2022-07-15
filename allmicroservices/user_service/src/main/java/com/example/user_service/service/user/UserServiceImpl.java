@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse saveUser(UserEntityDTO userEntityDTO, String fcmToken, String picPath) throws UserExceptionMessage {
-
+            logger.info(Messages.LoggerConstants.STARTING_METHOD_EXECUTION);
             UserEntity user = getUserByEmail(userEntityDTO.getEmail());
             if (user != null) {
                 return new UserResponse(Messages.FAILED, "User is already present", new ArrayList<>(Arrays.asList(user)), "", "");
@@ -84,21 +84,23 @@ public class UserServiceImpl implements UserService {
             }
             String jwtToken = jwtUtil.generateToken(ue.getUserName());
             String refreshToken = passwordEncoder.encode(ue.getUserId());
-
-            return new UserResponse(Messages.SUCCESS, "Saved user successfully", new ArrayList<>(Arrays.asList(ue)), jwtToken, refreshToken);
+        logger.info(Messages.LoggerConstants.EXITING_METHOD_EXECUTION);
+        return new UserResponse(Messages.SUCCESS, "Saved user successfully", new ArrayList<>(Arrays.asList(ue)), jwtToken, refreshToken);
 
     }
 
     @Override
     @Async
     public CompletableFuture<UserDetailResponsePage> getUsers(int pageNo, int pageSize) throws UserExceptionMessage {
-               Pageable paging = PageRequest.of(pageNo,pageSize);
+        logger.info(Messages.LoggerConstants.STARTING_METHOD_EXECUTION);
+        Pageable paging = PageRequest.of(pageNo,pageSize);
                Page<UserDetailEntityDTO> userEntityPage = userRepository.findAllUsers(paging);
                if(userEntityPage.isEmpty()){
                    throw new UserExceptionMessage(Messages.DATA_NOT_FOUND);
                }
                logger.info(Thread.currentThread().getName());
-               return  CompletableFuture.completedFuture(new UserDetailResponsePage(Messages.SUCCESS,Messages.DATA_FOUND,userEntityPage.getTotalElements(),userEntityPage.getTotalPages(),pageNo,userEntityPage.getContent()));
+        logger.info(Messages.LoggerConstants.EXITING_METHOD_EXECUTION);
+        return  CompletableFuture.completedFuture(new UserDetailResponsePage(Messages.SUCCESS,Messages.DATA_FOUND,userEntityPage.getTotalElements(),userEntityPage.getTotalPages(),pageNo,userEntityPage.getContent()));
 
 
 
@@ -107,56 +109,71 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity getUserById(String userId) throws UserExceptionMessage {
-
+        logger.info(Messages.LoggerConstants.STARTING_METHOD_EXECUTION);
             Optional<UserEntity> optionalUserEntity = Optional.ofNullable(userRepository.getUserById(userId));
             logger.info(Thread.currentThread().getName());
             if (optionalUserEntity.isEmpty()) {
                 throw new UserExceptionMessage(Messages.DATA_NOT_FOUND);
             }
-            return optionalUserEntity.get();
+        logger.info(Messages.LoggerConstants.EXITING_METHOD_EXECUTION);
+        return optionalUserEntity.get();
     }
 
 
     @Override
     public List<UserEntity> getUserByName(String userName) throws UserExceptionMessage, NullPointerException {
-            List<UserEntity> userEntity = userRepository.findByNameIgnoreCase(userName);
+
+        logger.info(Messages.LoggerConstants.STARTING_METHOD_EXECUTION);
+        List<UserEntity> userEntity = userRepository.findByNameIgnoreCase(userName);
             if (userEntity.isEmpty()) {
                 throw new UserExceptionMessage(Messages.DATA_NOT_FOUND);
             }
-            return userEntity;
+        logger.info(Messages.LoggerConstants.EXITING_METHOD_EXECUTION);
+        return userEntity;
 
 
     }
 
     @Override
     public UserMailDTO getUserByEmail1(String email) throws  UserExceptionMessage{
-           UserMailDTO userMailDTO=userRepository.findByMail1(email);
+
+        logger.info(Messages.LoggerConstants.STARTING_METHOD_EXECUTION);
+        UserMailDTO userMailDTO=userRepository.findByMail1(email);
            if(userMailDTO.getUserName()==null) {
                throw new UserExceptionMessage(Messages.DATA_NOT_FOUND);
            }
-           return userMailDTO;
+        logger.info(Messages.LoggerConstants.EXITING_METHOD_EXECUTION);
+        return userMailDTO;
     }
 
     @Override
     public UserEntity getUserByEmail(String email) {
-            return userRepository.findByMail(email);
+        logger.info(Messages.LoggerConstants.STARTING_METHOD_EXECUTION);
+        logger.info(Messages.LoggerConstants.EXITING_METHOD_EXECUTION);
+        return userRepository.findByMail(email);
     }
 
 
     @Override
     public String sendUserMedicines(Integer medId) throws UserExceptionMessage, FileNotFoundException {
-            Optional<UserMedicines> userMedicines = userMedicineRepository.findById(medId);
+
+        logger.info(Messages.LoggerConstants.STARTING_METHOD_EXECUTION);
+        Optional<UserMedicines> userMedicines = userMedicineRepository.findById(medId);
             if (userMedicines.isEmpty()) {
-                return Messages.DATA_NOT_FOUND;
+                throw new UserExceptionMessage(Messages.MEDICINE_NOT_FOUND);
             }
             UserEntity entity = userMedicines.get().getUserEntity();
             List<MedicineHistory> medicineHistories = userMedicines.get().getMedicineHistories();
-            return pdfMailSender.send(entity, userMedicines.get(), medicineHistories);
+
+        logger.info(Messages.LoggerConstants.EXITING_METHOD_EXECUTION);
+        return pdfMailSender.send(entity, userMedicines.get(), medicineHistories);
     }
 
     @Override
     public UserResponse login(String mail, String fcmToken) throws UserExceptionMessage {
-            UserEntity user = getUserByEmail(mail);
+
+        logger.info(Messages.LoggerConstants.STARTING_METHOD_EXECUTION);
+        UserEntity user = getUserByEmail(mail);
             UserDetails userDetails = user.getUserDetails();
             userDetails.setFcmToken(fcmToken);
             userDetailsRepository.save(userDetails);
@@ -164,6 +181,7 @@ public class UserServiceImpl implements UserService {
             if (user.getUserName() != null) {
                 String jwtToken = jwtUtil.generateToken(user.getUserName());
                 String refreshToken = passwordEncoder.encode(user.getUserId());
+                logger.info(Messages.LoggerConstants.EXITING_METHOD_EXECUTION);
                 return new UserResponse(Messages.SUCCESS, "Success", new ArrayList<>(Arrays.asList(user)), jwtToken, refreshToken);
             }
             throw new UserExceptionMessage(Messages.DATA_NOT_FOUND);
@@ -171,22 +189,27 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetailEntityDTO getUserById1(String userId) throws UserExceptionMessage {
-            Optional<UserDetailEntityDTO> optionalUserEntity = Optional.ofNullable(userRepository.getUserById1(userId));
+
+        logger.info(Messages.LoggerConstants.STARTING_METHOD_EXECUTION);
+        Optional<UserDetailEntityDTO> optionalUserEntity = Optional.ofNullable(userRepository.getUserById1(userId));
             logger.info(Thread.currentThread().getName());
             if (optionalUserEntity.isEmpty()) {
                 throw new UserExceptionMessage(Messages.DATA_NOT_FOUND);
             }
-            return optionalUserEntity.get();
+        logger.info(Messages.LoggerConstants.EXITING_METHOD_EXECUTION);
+        return optionalUserEntity.get();
     }
 
     @Override
     public List<UserMedicineDTO> getUserMedicineById(String userId) throws UserExceptionMessage{
-            Optional<List<UserMedicineDTO>> optionalUserEntity = Optional.ofNullable(userRepository.getUserMedicineById(userId));
+        logger.info(Messages.LoggerConstants.STARTING_METHOD_EXECUTION);
+        Optional<List<UserMedicineDTO>> optionalUserEntity = Optional.ofNullable(userRepository.getUserMedicineById(userId));
             logger.info(Thread.currentThread().getName());
             if (optionalUserEntity.isEmpty()) {
                 throw new UserExceptionMessage(Messages.DATA_NOT_FOUND);
             }
-            return optionalUserEntity.get();
+        logger.info(Messages.LoggerConstants.EXITING_METHOD_EXECUTION);
+        return optionalUserEntity.get();
 
     }
 
