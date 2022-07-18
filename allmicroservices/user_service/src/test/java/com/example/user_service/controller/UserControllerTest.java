@@ -1,5 +1,6 @@
 package com.example.user_service.controller;
 
+import com.example.user_service.controller.user.UserController;
 import com.example.user_service.model.user.UserEntity;
 import com.example.user_service.pojos.dto.LoginDTO;
 import com.example.user_service.pojos.dto.user.UserDetailEntityDTO;

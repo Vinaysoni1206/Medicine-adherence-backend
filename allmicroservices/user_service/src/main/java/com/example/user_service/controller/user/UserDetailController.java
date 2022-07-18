@@ -1,8 +1,8 @@
-package com.example.user_service.controller;
+package com.example.user_service.controller.user;
 
 
 
-import com.example.user_service.exception.UserExceptionMessage;
+import com.example.user_service.exception.user.UserExceptionMessage;
 import com.example.user_service.model.user.UserDetails;
 import com.example.user_service.pojos.dto.user.UserDetailsDTO;
 import com.example.user_service.pojos.response.user.UserDetailResponse;

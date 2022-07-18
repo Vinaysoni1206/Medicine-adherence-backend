@@ -1,7 +1,10 @@
-package com.example.user_service.exception;
+package com.example.user_service.exception.global;
 
+import com.example.user_service.exception.caretaker.UserCaretakerException;
+import com.example.user_service.exception.medicine.UserMedicineException;
+import com.example.user_service.exception.user.UserExceptionMessage;
 import com.example.user_service.pojos.response.caretaker.CaretakerResponse;
-import com.example.user_service.pojos.response.MedicineResponse;
+import com.example.user_service.pojos.response.medicine.MedicineResponse;
 import com.example.user_service.pojos.response.user.UserResponse;
 import com.example.user_service.util.Messages;
 import org.springframework.http.HttpStatus;

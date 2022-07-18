@@ -2,7 +2,7 @@ package com.example.user_service.service.user;
 
 
 import com.example.user_service.config.PdfMailSender;
-import com.example.user_service.exception.UserExceptionMessage;
+import com.example.user_service.exception.user.UserExceptionMessage;
 import com.example.user_service.model.medicine.MedicineHistory;
 import com.example.user_service.model.user.UserDetails;
 import com.example.user_service.model.user.UserEntity;

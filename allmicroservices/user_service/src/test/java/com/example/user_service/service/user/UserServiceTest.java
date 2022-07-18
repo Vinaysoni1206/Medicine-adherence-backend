@@ -1,8 +1,8 @@
 package com.example.userService;
 
 import com.example.user_service.config.PdfMailSender;
-import com.example.user_service.exception.UserExceptionMessage;
-import com.example.user_service.exception.UserMedicineException;
+import com.example.user_service.exception.user.UserExceptionMessage;
+import com.example.user_service.exception.medicine.UserMedicineException;
 import com.example.user_service.model.medicine.MedicineHistory;
 import com.example.user_service.model.medicine.UserMedicines;
 import com.example.user_service.model.user.UserDetails;

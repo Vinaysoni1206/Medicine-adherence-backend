@@ -1,8 +1,9 @@
 package com.example.user_service.controller;
 
+import com.example.user_service.controller.caretaker.CaretakerController;
 import com.example.user_service.model.user.UserCaretaker;
 import com.example.user_service.pojos.dto.SendImageDto;
-import com.example.user_service.pojos.dto.UserCaretakerDTO;
+import com.example.user_service.pojos.dto.caretaker.UserCaretakerDTO;
 import com.example.user_service.service.caretaker.CareTakerService;
 import com.example.user_service.util.Messages;
 import com.fasterxml.jackson.databind.ObjectMapper;

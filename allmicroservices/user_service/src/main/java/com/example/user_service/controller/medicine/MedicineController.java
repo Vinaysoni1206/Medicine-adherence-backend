@@ -1,12 +1,12 @@
-package com.example.user_service.controller;
+package com.example.user_service.controller.medicine;
 
 
-import com.example.user_service.exception.UserMedicineException;
+import com.example.user_service.exception.medicine.UserMedicineException;
 import com.example.user_service.pojos.dto.medicine.MedicineHistoryDTO;
 
 import com.example.user_service.pojos.dto.medicine.MedicinePojo;
 import com.example.user_service.pojos.response.image.ImageListResponse;
-import com.example.user_service.pojos.response.MedicineResponse;
+import com.example.user_service.pojos.response.medicine.MedicineResponse;
 import com.example.user_service.pojos.response.SyncResponse;
 import com.example.user_service.repository.UserMedicineRepository;
 import com.example.user_service.repository.UserRepository;

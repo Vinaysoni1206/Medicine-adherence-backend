@@ -1,12 +1,12 @@
-package com.example.user_service.controller;
+package com.example.user_service.controller.caretaker;
 
-import com.example.user_service.exception.UserCaretakerException;
+import com.example.user_service.exception.caretaker.UserCaretakerException;
 
-import com.example.user_service.exception.UserExceptionMessage;
+import com.example.user_service.exception.user.UserExceptionMessage;
 import com.example.user_service.model.user.UserCaretaker;
 import com.example.user_service.pojos.Notificationmessage;
 import com.example.user_service.pojos.dto.SendImageDto;
-import com.example.user_service.pojos.dto.UserCaretakerDTO;
+import com.example.user_service.pojos.dto.caretaker.UserCaretakerDTO;
 import com.example.user_service.pojos.response.caretaker.CaretakerDelete;
 import com.example.user_service.pojos.response.caretaker.CaretakerListResponse;
 import com.example.user_service.pojos.response.caretaker.CaretakerResponse;

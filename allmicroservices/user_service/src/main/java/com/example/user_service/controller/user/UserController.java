@@ -1,8 +1,8 @@
-package com.example.user_service.controller;
+package com.example.user_service.controller.user;
 
 
-import com.example.user_service.exception.UserExceptionMessage;
-import com.example.user_service.exception.UserMedicineException;
+import com.example.user_service.exception.user.UserExceptionMessage;
+import com.example.user_service.exception.medicine.UserMedicineException;
 import com.example.user_service.pojos.MailInfo;
 import com.example.user_service.pojos.dto.LoginDTO;
 import com.example.user_service.pojos.dto.user.UserDetailEntityDTO;

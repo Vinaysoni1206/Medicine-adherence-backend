@@ -1,7 +1,7 @@
 package com.example.user_service.service.user;
 
-import com.example.user_service.exception.UserExceptionMessage;
-import com.example.user_service.exception.UserMedicineException;
+import com.example.user_service.exception.user.UserExceptionMessage;
+import com.example.user_service.exception.medicine.UserMedicineException;
 import com.example.user_service.model.user.UserEntity;
 import com.example.user_service.pojos.dto.user.UserDetailEntityDTO;
 import com.example.user_service.pojos.dto.user.UserEntityDTO;
