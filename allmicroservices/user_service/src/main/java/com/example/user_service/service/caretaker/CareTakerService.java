@@ -4,7 +4,7 @@ import com.example.user_service.exception.UserCaretakerException;
 import com.example.user_service.exception.UserExceptionMessage;
 import com.example.user_service.model.user.UserCaretaker;
 import com.example.user_service.pojos.dto.UserCaretakerDTO;
-import com.example.user_service.pojos.response.ImageResponse;
+import com.example.user_service.pojos.response.image.ImageResponse;
 import com.example.user_service.pojos.response.caretaker.CaretakerResponsePage;
 import org.springframework.web.multipart.MultipartFile;
 

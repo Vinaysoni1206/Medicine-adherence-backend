@@ -8,13 +8,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.util.Date;
+
+import static com.example.user_service.util.Messages.NullEmptyConstants.CARETAKER_NAME_EMPTY;
+
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "image")
+@Table(name = "image", indexes = @Index(name = "index_imgId" , columnList = "image_id"))
 public class   Image {
 
     @Id
@@ -35,6 +39,7 @@ public class   Image {
     private String time;
 
     @Column(name = "caretaker_name",nullable = false,length = 60)
+    @NotEmpty(message = CARETAKER_NAME_EMPTY)
     private String caretakerName;
 
     @Column(name = "image_url",nullable = false,length = 100)
@@ -49,4 +54,4 @@ public class   Image {
     UserMedicines userMedicines;
 
 }
-//
+

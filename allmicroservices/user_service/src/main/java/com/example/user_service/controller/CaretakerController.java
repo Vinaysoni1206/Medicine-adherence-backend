@@ -10,7 +10,7 @@ import com.example.user_service.pojos.dto.UserCaretakerDTO;
 import com.example.user_service.pojos.response.caretaker.CaretakerDelete;
 import com.example.user_service.pojos.response.caretaker.CaretakerListResponse;
 import com.example.user_service.pojos.response.caretaker.CaretakerResponse;
-import com.example.user_service.pojos.response.ImageResponse;
+import com.example.user_service.pojos.response.image.ImageResponse;
 import com.example.user_service.pojos.response.caretaker.CaretakerResponsePage;
 import com.example.user_service.service.caretaker.CareTakerService;
 import com.example.user_service.util.Messages;

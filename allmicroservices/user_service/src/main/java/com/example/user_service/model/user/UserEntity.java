@@ -8,8 +8,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.example.user_service.util.Messages.NullEmptyConstants.USER_EMAIL_EMPTY;
+import static com.example.user_service.util.Messages.NullEmptyConstants.USER_NAME_EMPTY;
 
 
 //@NamedNativeQuery(name = "UserEntity.getUserById1",
@@ -22,7 +26,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "user",
-        indexes = @Index(name = "inedx_fn",columnList = "user_id"))
+        indexes = @Index(name = "inedx_fn",columnList = "user_id,user_name,email"))
 @NamedEntityGraph(name="userDetail_graph" , attributeNodes = @NamedAttributeNode(value = "userDetails"))
 public class UserEntity {
 
@@ -36,9 +40,11 @@ public class UserEntity {
   private String userId;
 
   @Column(name = "user_name",nullable = false)
+  @NotEmpty(message = USER_NAME_EMPTY)
   private String userName;
 
   @Column(name = "email",nullable = false)
+  @NotEmpty(message = USER_EMAIL_EMPTY)
   private String email;
 
   @Column(name = "last_login",nullable = false)
@@ -67,4 +73,3 @@ public class UserEntity {
   public <D> UserEntity(D map) {
   }
 }
-///

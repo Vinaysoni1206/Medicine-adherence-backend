@@ -1,7 +1,6 @@
 package com.example.user_service.security;
 
 import com.example.user_service.util.JwtUtil;
-import com.example.user_service.util.Messages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,6 +10,9 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import static com.example.user_service.util.Messages.LoggerConstants.EXITING_METHOD_EXECUTION;
+import static com.example.user_service.util.Messages.LoggerConstants.STARTING_METHOD_EXECUTION;
 
 @Service
 public class AuthenticationHandler implements HandlerInterceptor {
@@ -31,14 +33,12 @@ public class AuthenticationHandler implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-        logger.info(Messages.LoggerConstants.STARTING_METHOD_EXECUTION);
+        logger.info(STARTING_METHOD_EXECUTION);
         final String authorizationHeader = request.getHeader("Authorization");
 
         String jwt = null;
         String username = null;
         final String id = request.getParameter("userId");
-        logger.info(id);
-        logger.info(authorizationHeader);
         try {
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                 jwt = authorizationHeader.substring(7);
@@ -57,7 +57,7 @@ public class AuthenticationHandler implements HandlerInterceptor {
                     if (request.getAttribute("expired").equals("true")) {
                         logger.info("expired");
                         response.setStatus(401);
-                        logger.info(Messages.LoggerConstants.EXITING_METHOD_EXECUTION);
+                        logger.info(EXITING_METHOD_EXECUTION);
                         return false;
                     }
                     response.setStatus(403);
@@ -65,9 +65,8 @@ public class AuthenticationHandler implements HandlerInterceptor {
                 } else {
                     logger.info(userDetails.getUsername());
                     response.setHeader("jwt",jwt);
-                    logger.info(Messages.LoggerConstants.EXITING_METHOD_EXECUTION);
+                    logger.info(EXITING_METHOD_EXECUTION);
                     return true;
-
                 }
             } catch (Exception usernameNotFoundException) {
                 response.setStatus(404);
@@ -77,13 +76,13 @@ public class AuthenticationHandler implements HandlerInterceptor {
                         "}";
                 response.setContentType("application/json");
                 response.getWriter().write(content);
-                logger.info(Messages.LoggerConstants.EXITING_METHOD_EXECUTION);
+                logger.info(EXITING_METHOD_EXECUTION);
                 return false;
             }
 
         }
         response.setStatus(401);
-        logger.info(Messages.LoggerConstants.EXITING_METHOD_EXECUTION);
+        logger.info(EXITING_METHOD_EXECUTION);
         return false;
     }
 }

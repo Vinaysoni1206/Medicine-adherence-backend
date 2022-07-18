@@ -9,6 +9,9 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+
+import static com.example.user_service.util.Messages.NullEmptyConstants.*;
 
 @Data
 @NoArgsConstructor
@@ -27,12 +30,14 @@ public class UserDetails {
     private String userDetId;
 
     @Column(name = "bio",nullable = false,length = 250)
+    @NotEmpty(message = BIO_EMPTY)
     private String bio;
 
     @Column(name = "pic_path",nullable = false)
     private String picPath;
 
     @Column(name = "age",nullable = false,length = 4)
+    @NotEmpty(message = AGE_EMPTY)
     @Range(min = 1)
     private int age;
 
@@ -44,6 +49,7 @@ public class UserDetails {
 
     @Column(name = "user_contact",nullable = false)
     @Range(min = 10)
+    @NotEmpty(message = CONTACT_EMPTY)
     private Long userContact;
 
     @Column(name = "lattitude")
@@ -56,15 +62,19 @@ public class UserDetails {
     private String address;
 
     @Column(name = "gender",nullable = false,length = 10)
+    @NotEmpty(message = GENDER_EMPTY)
     private String gender;
 
     @Column(name = "blood_group",nullable = false,length = 3)
+    @NotEmpty(message = BLOOD_GROUP_EMPTY)
     private String bloodGroup;
 
     @Column(name = "martial_status",nullable = false, length = 10)
+    @NotEmpty(message = MARITAL_STATUS_EMPTY)
     private String maritalStatus;
 
     @Column(name = "weight",nullable = false,length = 3)
+    @NotEmpty(message = WEIGHT_EMPTY)
     @Range(min = 2)
     private int weight;
 

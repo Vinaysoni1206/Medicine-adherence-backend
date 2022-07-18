@@ -8,7 +8,7 @@ import com.example.user_service.model.user.UserCaretaker;
 import com.example.user_service.model.user.UserEntity;
 import com.example.user_service.pojos.dto.SendImageDto;
 import com.example.user_service.pojos.dto.UserCaretakerDTO;
-import com.example.user_service.pojos.response.ImageResponse;
+import com.example.user_service.pojos.response.image.ImageResponse;
 import com.example.user_service.pojos.response.caretaker.CaretakerResponsePage;
 import com.example.user_service.repository.ImageRepository;
 import com.example.user_service.repository.UserCaretakerRepository;

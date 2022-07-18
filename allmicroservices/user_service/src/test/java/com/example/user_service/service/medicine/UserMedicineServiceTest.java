@@ -57,7 +57,7 @@ class UserMedicineServiceTest {
     void getAllUserMedicinesExceptionTest(){
         when(userRepository.getUserById("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(null);
         try{
-            userMedicineServiceImpl.getallUserMedicines("73578dfd-e7c9-4381-a348-113e72d80fa2");
+            userMedicineServiceImpl.getAllUserMedicines("73578dfd-e7c9-4381-a348-113e72d80fa2");
         }catch (UserExceptionMessage | UserMedicineException userExceptionMessage){
             Assertions.assertEquals("Data not found",userExceptionMessage.getMessage());
         }
@@ -70,7 +70,7 @@ class UserMedicineServiceTest {
         userMedicines1.add(userMedicines);
         UserEntity user = new UserEntity("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,userMedicines1);
         when(userRepository.getUserById("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(user);
-        CompletableFuture<List<UserMedicines>> listCompletableFuture= userMedicineServiceImpl.getallUserMedicines("73578dfd-e7c9-4381-a348-113e72d80fa2");
+        CompletableFuture<List<UserMedicines>> listCompletableFuture= userMedicineServiceImpl.getAllUserMedicines("73578dfd-e7c9-4381-a348-113e72d80fa2");
         Assertions.assertEquals(1,listCompletableFuture.get().size());
     }
 
@@ -147,7 +147,7 @@ class UserMedicineServiceTest {
         try{
             userMedicineServiceImpl.getMedicineHistory(123);
         }catch (UserMedicineException e){
-            Assertions.assertEquals("No record found!!",e.getMessage());
+            Assertions.assertEquals("No record found",e.getMessage());
         }
     }
 

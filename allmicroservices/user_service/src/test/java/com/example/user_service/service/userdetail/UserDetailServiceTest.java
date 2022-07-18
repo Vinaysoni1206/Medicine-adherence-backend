@@ -45,7 +45,7 @@ class UserDetailServiceTest {
        try {
            userDetailServiceImpl.saveUserDetail("feyiafiafgiagfieagfi", userDetailsDTO);
        }catch(UserExceptionMessage userExceptionMessage) {
-           Assertions.assertEquals("User not found",userExceptionMessage.getMessage());
+           Assertions.assertEquals("Data not found",userExceptionMessage.getMessage());
        }
        }
 

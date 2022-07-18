@@ -6,12 +6,14 @@ import com.example.user_service.model.user.UserEntity;
 import com.example.user_service.pojos.dto.user.UserDetailsDTO;
 import com.example.user_service.repository.UserDetailsRepository;
 import com.example.user_service.repository.UserRepository;
-import com.example.user_service.util.Messages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+
+import static com.example.user_service.util.Messages.*;
+import static com.example.user_service.util.Messages.LoggerConstants.*;
 
 @Service
 public class UserDetailServiceImpl implements UserDetailService {
@@ -28,10 +30,10 @@ public class UserDetailServiceImpl implements UserDetailService {
     }
     @Override
     public UserDetails saveUserDetail(String id, UserDetailsDTO userDetailsDTO) throws UserExceptionMessage {
-        logger.info(Messages.LoggerConstants.STARTING_METHOD_EXECUTION);
+        logger.info(STARTING_METHOD_EXECUTION);
             Optional<UserEntity> user = Optional.ofNullable(userRepository.getUserById(id));
             if (user.isEmpty()) {
-                throw new UserExceptionMessage("User not found");
+                throw new UserExceptionMessage(DATA_NOT_FOUND);
             }
             UserDetails userDetails1 = user.get().getUserDetails();
 
@@ -42,9 +44,9 @@ public class UserDetailServiceImpl implements UserDetailService {
             userDetails1.setWeight(userDetailsDTO.getWeight());
             userDetails1.setMaritalStatus(userDetailsDTO.getMaritalStatus());
             userDetails1.setUserContact(userDetailsDTO.getUserContact());
-            logger.info(Messages.LoggerConstants.RESPONSE_SAVED);
+            logger.info(RESPONSE_SAVED);
             userDetailsRepository.save(userDetails1);
-            logger.info(Messages.LoggerConstants.EXITING_METHOD_EXECUTION);
+            logger.info(EXITING_METHOD_EXECUTION);
             return userDetails1;
         }
 

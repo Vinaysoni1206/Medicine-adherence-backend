@@ -5,7 +5,7 @@ import com.example.user_service.exception.UserMedicineException;
 import com.example.user_service.pojos.dto.medicine.MedicineHistoryDTO;
 
 import com.example.user_service.pojos.dto.medicine.MedicinePojo;
-import com.example.user_service.pojos.response.ImageListResponse;
+import com.example.user_service.pojos.response.image.ImageListResponse;
 import com.example.user_service.pojos.response.MedicineResponse;
 import com.example.user_service.pojos.response.SyncResponse;
 import com.example.user_service.repository.UserMedicineRepository;

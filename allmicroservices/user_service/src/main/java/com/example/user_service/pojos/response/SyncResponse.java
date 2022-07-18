@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SyncResponse {
 
-
     private String status;
     private String message;
 

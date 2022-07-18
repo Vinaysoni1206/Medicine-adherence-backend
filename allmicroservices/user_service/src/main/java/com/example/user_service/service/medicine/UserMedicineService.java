@@ -10,11 +10,11 @@ import com.example.user_service.pojos.response.MedicineResponse;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-//
+
 public interface UserMedicineService {
 
 
-    CompletableFuture<List<UserMedicines>> getallUserMedicines(String userId) throws UserMedicineException, UserExceptionMessage;
+    CompletableFuture<List<UserMedicines>> getAllUserMedicines(String userId) throws UserMedicineException, UserExceptionMessage;
 
     String syncData(String userId , List<MedicinePojo> list) throws UserMedicineException;
 
