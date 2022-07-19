@@ -1,9 +1,9 @@
 package com.example.user_service.repository;
 
-import com.example.user_service.model.user.UserEntity;
-import com.example.user_service.pojos.dto.user.UserDetailEntityDTO;
-import com.example.user_service.pojos.dto.user.UserMailDTO;
-import com.example.user_service.pojos.dto.user.UserMedicineDTO;
+import com.example.user_service.model.User;
+import com.example.user_service.pojos.request.UserDetailEntityDTO;
+import com.example.user_service.pojos.request.UserMailDTO;
+import com.example.user_service.pojos.request.UserMedicineDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -12,41 +12,44 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 
+/**
+ * This is a user repository class
+ */
 @Repository
-public interface UserRepository extends JpaRepository<UserEntity, Integer> {
+public interface UserRepository extends JpaRepository<User, Integer> {
 
-    @Query("select u from UserEntity u where lower(u.userName) like lower(concat(?1,'%'))")
+    @Query("select u from User u where lower(u.userName) like lower(concat(?1,'%'))")
     @EntityGraph(type = EntityGraph.EntityGraphType.FETCH,value = "userDetail_graph")
-    public List<UserEntity> findByNameIgnoreCase(String userName);
+    public List<User> findByNameIgnoreCase(String userName);
 
-    @Query("select u from UserEntity u where lower(u.email) like lower(?1)")
-    public UserEntity findByMail(String email);
+    @Query("select u from User u where lower(u.email) like lower(?1)")
+    public User findByMail(String email);
 
-    @Query("select new com.example.user_service.pojos.dto.user.UserMailDTO("+
+    @Query("select new com.example.user_service.pojos.request.UserMailDTO("+
             "u.userName, u.email, d.picPath) "+
-            "from UserEntity as u  inner join u.userDetails as d where lower(u.email) like lower(?1)")
+            "from User as u  inner join u.userDetails as d where lower(u.email) like lower(?1)")
     public UserMailDTO findByMail1(String email);
 
-    @Query("SELECT u from UserEntity u where u.userId = ?1")
-    public UserEntity getUserById(String userId);
+    @Query("SELECT u from User u where u.userId = ?1")
+    public User getUserById(String userId);
 
-    @Query("select new com.example.user_service.pojos.dto.user.UserMedicineDTO("+
+    @Query("select new com.example.user_service.pojos.request.UserMedicineDTO("+
             "m.medicineName, m.title, m.medicineDes, m.startDate,m.endDate, m.time, m.days) " +
-            "from UserEntity as u inner join u.userMedicines as m where u.userId = ?1 ")
+            "from User as u inner join u.userMedicines as m where u.userId = ?1 ")
     public List<UserMedicineDTO> getUserMedicineById(String userId);
 
-    @Query("select new com.example.user_service.pojos.dto.user.UserDetailEntityDTO("+
+    @Query("select new com.example.user_service.pojos.request.UserDetailEntityDTO("+
             "u.userName, u.email, d.bio, d.age, d.userContact, d.gender, d.bloodGroup,d.maritalStatus," +
             "d.weight ) " +
-            "from UserEntity as u inner join u.userDetails as d")
+            "from User as u inner join u.userDetails as d")
 //    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH,value = "userDetail_graph")
     Page<UserDetailEntityDTO> findAllUsers(Pageable pageable);
 
 
-    @Query("select new com.example.user_service.pojos.dto.user.UserDetailEntityDTO("+
+    @Query("select new com.example.user_service.pojos.request.UserDetailEntityDTO("+
             "u.userName, u.email, d.bio, d.age, d.userContact, d.gender, d.bloodGroup,d.maritalStatus," +
             "d.weight ) " +
-            "from UserEntity as u inner join u.userDetails as d where u.userId = ?1 ")
+            "from User as u inner join u.userDetails as d where u.userId = ?1 ")
     public UserDetailEntityDTO getUserById1(String  userId);
 
 }

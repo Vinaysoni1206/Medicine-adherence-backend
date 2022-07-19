@@ -1,11 +1,10 @@
 package com.example.user_service.controller;
 
-import com.example.user_service.controller.medicine.MedicineController;
-import com.example.user_service.model.user.UserEntity;
-import com.example.user_service.pojos.dto.medicine.MedicineHistoryDTO;
-import com.example.user_service.pojos.dto.medicine.MedicinePojo;
-import com.example.user_service.service.medicine.UserMedicineService;
-import com.example.user_service.util.Messages;
+import com.example.user_service.model.User;
+import com.example.user_service.pojos.request.MedicineHistoryDTO;
+import com.example.user_service.pojos.request.MedicinePojo;
+import com.example.user_service.service.UserMedicineService;
+import com.example.user_service.util.Constants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,7 +44,7 @@ class MedicineControllerTest {
         this.mockMvc= MockMvcBuilders.standaloneSetup(medicineController).build();
     }
 
-    UserEntity userEntity = new UserEntity("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
+    User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
     MedicinePojo medicinePojo= new MedicinePojo(123,"Mon",1,null,"something",10,"PCM","something",null,0,"10:00 AM");
     List<MedicinePojo> medicinePojoList = new ArrayList<>();
 
@@ -56,7 +55,7 @@ class MedicineControllerTest {
     @DisplayName("Test for syncing data - POST")
     void syncData() throws  Exception{
         medicinePojoList.add(medicinePojo);
-        Mockito.when(userMedicineService.syncData("73578dfd-e7c9-4381-a348-113e72d80fa2",medicinePojoList)).thenReturn(Messages.SUCCESS);
+        Mockito.when(userMedicineService.syncData("73578dfd-e7c9-4381-a348-113e72d80fa2",medicinePojoList)).thenReturn(Constants.SUCCESS);
         String jsonText= objectMapper.writeValueAsString(medicinePojoList);
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/v1/medicines/sync?userId=73578dfd-e7c9-4381-a348-113e72d80fa2")

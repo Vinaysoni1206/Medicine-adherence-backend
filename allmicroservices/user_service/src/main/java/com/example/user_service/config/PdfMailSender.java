@@ -1,30 +1,31 @@
 package com.example.user_service.config;
-import com.example.user_service.model.medicine.MedicineHistory;
-import com.example.user_service.model.medicine.UserMedicines;
-import com.example.user_service.model.user.UserDetails;
-import com.example.user_service.model.user.UserEntity;
+import com.example.user_service.model.MedicineHistory;
+import com.example.user_service.model.UserMedicines;
+import com.example.user_service.model.UserDetails;
+import com.example.user_service.model.User;
 import com.itextpdf.html2pdf.HtmlConverter;
 import org.springframework.stereotype.Component;
+import static com.example.user_service.util.Constants.*;
+
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.List;
 import java.util.UUID;
 
-
+/**
+ * This is config class to create pdf
+ */
 @Component
 public class PdfMailSender {
 
-    private static final String DIV = "</div>\n";
-    private static final String SPAN ="</span><br>\n";
-    private static final String TD = "</td>\n";
-    private static final String STYLE ="<td style='border: 0.5px solid black;text-align: center;vertical-align: middle;height: 40px;'>";
 
-    public String send(UserEntity userEntity, UserMedicines userMedicines
+
+    public String send(User user, UserMedicines userMedicines
             , List<MedicineHistory> medicineHistoryList) throws FileNotFoundException {
 
 
-        UserDetails userDetails = userEntity.getUserDetails();
+        UserDetails userDetails = user.getUserDetails();
         final String[] filepath = new String[1];
         final String[] html = new String[1];
         html[0] = "<div style='padding:10px;height: 100%; border-color: #3743ab; border-width: 3px;border-style: solid;border-radius: 10px;padding-left: 20px;padding-right: 20px;'>\n" +
@@ -35,7 +36,7 @@ public class PdfMailSender {
                 "            </div>\n" +
                 "           <div style='font-size:24px; margin-bottom: 8px; font-weight: 600; color: gray;'>Patient Details </div>\n" +
                 "            <div align='left'>\n" +
-                "                 <div>Name - "+userEntity.getUserName()+DIV +
+                "                 <div>Name - "+ user.getUserName()+DIV +
                 "                 <div>Age - "+userDetails.getAge()+DIV +
                 "                 <div>Blood Group - "+userDetails.getBloodGroup()+DIV  +
                 "                  <div>Marital Status - Unmarried</div>\n" +

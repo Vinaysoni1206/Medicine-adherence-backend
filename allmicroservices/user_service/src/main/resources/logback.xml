@@ -43,7 +43,7 @@
     <logger name="com.com.example.user_service" level="debug" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
-    <root level="error">
+    <root level="info">
         <appender-ref ref="CONSOLE"/>
     </root>
 

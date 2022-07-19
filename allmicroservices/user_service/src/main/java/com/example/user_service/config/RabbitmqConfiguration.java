@@ -9,54 +9,65 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
+/**
+ * This is config class for RabbitMQ message broker
+ */
 @Configuration
 public class RabbitmqConfiguration {
 
-    @Value("${project.rabbitmq.queue}")
-    private String queueName;
+    @Value("${project.rabbitmq.queueMail}")
+    private String queueMail;
 
-    @Value("${project.rabbitmq.queue2}")
-    private String queue2Name;
+    @Value("${project.rabbitmq.queueNotification}")
+    private String queueNotification;
 
 
     @Value("${project.rabbitmq.exchange}")
     private String topicExchange;
 
-    @Value("${project.rabbitmq.routingkey}")
-    private String routingKey;
+    @Value("${project.rabbitmq.routingKeyMail}")
+    private String routingKeyMail;
 
-    @Value("${project.rabbitmq.routingkey2}")
-    private String routingKey2;
+    @Value("${project.rabbitmq.routingKeyNotify}")
+    private String routingKeyNotify;
     @Bean(name = "queue1")
+    @Profile("dev")
     public Queue getMailQueue(){
-    return new Queue(queueName);
+    return new Queue(queueMail);
 }
     @Bean(name = "queue2")
+    @Profile("dev")
     public Queue getNotificationQueue(){
-        return new Queue(queue2Name);
+        return new Queue(queueNotification);
     }
     @Bean
+    @Profile("dev")
     public TopicExchange getTopicExchange(){
         return new TopicExchange(topicExchange);
     }
 
     @Bean(name = "bind1")
+    @Profile("dev")
     Binding binding1(@Qualifier("queue1") Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(routingKey);
+        return BindingBuilder.bind(queue).to(exchange).with(routingKeyMail);
     }
 
     @Bean(name = "bind2")
+    @Profile("dev")
     Binding binding2(@Qualifier("queue2") Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(routingKey2);
+        return BindingBuilder.bind(queue).to(exchange).with(routingKeyNotify);
     }
 
     @Bean
+    @Profile("dev")
     public Jackson2JsonMessageConverter jsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
     }
 
     @Bean
+    @Profile("dev")
     public AmqpTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(jsonMessageConverter());
@@ -67,4 +78,4 @@ public class RabbitmqConfiguration {
 
 
 }
-//
+

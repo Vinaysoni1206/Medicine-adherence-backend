@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.example</groupId>
 	<artifactId>user_service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>user_service</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
@@ -24,23 +24,14 @@
 			**/com/example/user_service/batch/*,
 			**/com/example/user_service/config/*,
 			**/com/example/user_service/config/filter/*,
-<!--			**/com/example/user_service/exception/*,-->
-<!--			**/com/example/user_service/model/*,-->
 			**/com/example/user_service/model/user/*,
-			**/com/example/user_service/pojos/*,
-			**/com/example/user_service/pojos/dto/*,
-			**/com/example/user_service/pojos/dto/user/*,
-			**/com/example/user_service/pojos/dto/medicine/*,
-			**/com/example/user_service/pojos/response/*,
-			**/com/example/user_service/pojos/response/user/*,
-			**/com/example/user_service/pojos/response/caretaker/*,
-			**/com/example/user_service/pojos/authentication/*,
+			**/com/example/user_service/pojos/**,
 			**/com/example/user_service/repository/*,
 			**/com/example/user_service/security/SecurityLayer.java,
 			**/com/example/user_service/security/TokenRefreshRequest.java,
 			**/com/example/user_service/security/WebConfiguration.java,
 			**/com/example/user_service/util/Datehelper.java,
-			**/com/example/user_service/util/Messages.java,
+			**/com/example/user_service/util/Constants.java,
 			**/com/example/user_service/validators/*,
 			**/com/example/user_service/UserServiceApplication.java
 		</sonar.coverage.exclusions>
@@ -196,8 +187,13 @@
 			<artifactId>flyway-mysql</artifactId>
 			<version>8.5.13</version>
 		</dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>2.1.2</version>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
 	<build>
 		<plugins>
@@ -230,6 +226,7 @@
 						<exclude>**/entity/**</exclude>
 						<exclude>**/interceptor/**</exclude>
 						<exclude>**/model/**</exclude>
+						<exclude>**/pojos/**</exclude>
 					</excludes>
 				</configuration>
 				<executions>

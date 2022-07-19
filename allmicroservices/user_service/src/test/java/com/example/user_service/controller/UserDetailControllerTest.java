@@ -1,9 +1,8 @@
 package com.example.user_service.controller;
 
-import com.example.user_service.controller.user.UserDetailController;
-import com.example.user_service.model.user.UserDetails;
-import com.example.user_service.pojos.dto.user.UserDetailsDTO;
-import com.example.user_service.service.userdetail.UserDetailService;
+import com.example.user_service.model.UserDetails;
+import com.example.user_service.pojos.request.UserDetailsDTO;
+import com.example.user_service.service.UserDetailService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

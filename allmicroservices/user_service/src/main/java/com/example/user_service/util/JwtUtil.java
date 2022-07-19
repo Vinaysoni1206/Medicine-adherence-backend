@@ -13,13 +13,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * This is util class to generate and validate token
+ */
 @Service
 public class JwtUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
 //    @Value("${project.jwt.secretkey}")
-    private String secretKey="medicineadherencesecretkey";
+    private static final String secretKey="medicineadherencesecretkey";
 
     @Value("${project.jwt.jwtExpirationMs}")
     private int jwtExpirationMs;
@@ -54,15 +57,26 @@ public class JwtUtil {
     private String createToken(Map<String, Object> claims, String subject) {
 
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10 * 10))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15))
                 .signWith(SignatureAlgorithm.HS256, secretKey).compact();
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails ) {
+    public String generateRefreshToken(String userId) {
+        logger.info("Generating token");
+        Map<String, Object> claims = new HashMap<>();
+        return createRefreshToken(claims, userId);
+    }
 
+    private String createRefreshToken(Map<String, Object> claims, String subject) {
+
+        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 40))
+                .signWith(SignatureAlgorithm.HS256, secretKey).compact();
+    }
+    public Boolean validateToken(String token, UserDetails userDetails ) {
         logger.info("Validating token");
-            final String username = extractUsername(token);
-            return (username.equals(userDetails.getUsername()));
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername()));
 
     }
 }

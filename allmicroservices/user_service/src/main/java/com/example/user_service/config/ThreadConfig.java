@@ -2,16 +2,20 @@ package com.example.user_service.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
-
+/**
+ * This is config class for running tasks asynchronously
+ */
 @Configuration
 @EnableAsync
 public class ThreadConfig  {
 
     @Bean
+    @Profile("dev")
     public Executor getExecutor(){
 
     ThreadPoolTaskExecutor threadPoolTaskExecutor =
@@ -28,5 +32,4 @@ public class ThreadConfig  {
 
 }
 
-//
 }

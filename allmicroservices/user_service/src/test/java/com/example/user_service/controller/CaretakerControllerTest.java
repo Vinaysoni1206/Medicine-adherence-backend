@@ -1,11 +1,10 @@
 package com.example.user_service.controller;
 
-import com.example.user_service.controller.caretaker.CaretakerController;
-import com.example.user_service.model.user.UserCaretaker;
-import com.example.user_service.pojos.dto.SendImageDto;
-import com.example.user_service.pojos.dto.caretaker.UserCaretakerDTO;
-import com.example.user_service.service.caretaker.CareTakerService;
-import com.example.user_service.util.Messages;
+import com.example.user_service.model.UserCaretaker;
+import com.example.user_service.pojos.request.SendImageDto;
+import com.example.user_service.pojos.request.UserCaretakerDTO;
+import com.example.user_service.service.CareTakerService;
+import com.example.user_service.util.Constants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -65,7 +64,7 @@ class CaretakerControllerTest {
                 .post("/api/v1/request")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonText))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isCreated());
     }
 
     @Test
@@ -74,7 +73,7 @@ class CaretakerControllerTest {
     void updateCaretakerStatus() throws Exception{
         Mockito.when(careTakerService.updateCaretakerStatus("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(userCaretaker);
         mockMvc.perform(MockMvcRequestBuilders
-                .put("/api/v1/accept?cId=73578dfd-e7c9-4381-a348-113e72d80fa2")
+                .put("/api/v1/accept?caretakerId=73578dfd-e7c9-4381-a348-113e72d80fa2")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
@@ -116,7 +115,7 @@ class CaretakerControllerTest {
     @ExtendWith(MockitoExtension.class)
     @DisplayName("Test for fetching list of caretaker request for a patient - GET")
     void getCaretakerRequestsP() throws Exception{
-        Mockito.when(careTakerService.getCaretakerRequestsP("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(userCaretakerList);
+        Mockito.when(careTakerService.getCaretakerRequests("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(userCaretakerList);
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/api/v1/caretaker/requests?patientId=73578dfd-e7c9-4381-a348-113e72d80fa2")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -127,9 +126,9 @@ class CaretakerControllerTest {
     @ExtendWith(MockitoExtension.class)
     @DisplayName("Test for deleting a patient request - GET")
     void delPatientReq() throws Exception{
-        Mockito.when(careTakerService.delPatientReq("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(Messages.SUCCESS);
+        Mockito.when(careTakerService.delPatientReq("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(Constants.SUCCESS);
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/api/v1/delete?cId=73578dfd-e7c9-4381-a348-113e72d80fa2")
+                        .get("/api/v1/delete?caretakerId=73578dfd-e7c9-4381-a348-113e72d80fa2")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
@@ -139,7 +138,7 @@ class CaretakerControllerTest {
     @DisplayName("Test to notify a user - GET")
     void notifyUserForMed() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/api/v1/notifyuser?fcmToken=egufagfljbgalgfoeiugi&medname=PCM")
+                        .get("/api/v1/notify/user?fcmToken=egufagfljbgalgfoeiugi&medName=PCM")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
@@ -159,6 +158,6 @@ class CaretakerControllerTest {
                         .param("id",sendImageDto.getId())
                         .param("medId",sendImageDto.getMedId().toString())
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isCreated());
     }
 }

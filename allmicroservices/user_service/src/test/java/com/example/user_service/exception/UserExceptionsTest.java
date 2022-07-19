@@ -1,13 +1,9 @@
 package com.example.user_service.exception;
 
-import com.example.user_service.exception.caretaker.UserCaretakerException;
-import com.example.user_service.exception.global.GlobalExceptions;
-import com.example.user_service.exception.medicine.UserMedicineException;
-import com.example.user_service.exception.user.UserExceptionMessage;
-import com.example.user_service.pojos.response.medicine.MedicineResponse;
-import com.example.user_service.pojos.response.caretaker.CaretakerResponse;
-import com.example.user_service.pojos.response.user.UserResponse;
-import com.example.user_service.util.Messages;
+import com.example.user_service.pojos.response.MedicineResponse;
+import com.example.user_service.pojos.response.CaretakerResponse;
+import com.example.user_service.pojos.response.UserResponse;
+import com.example.user_service.util.Constants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,34 +42,34 @@ class UserExceptionsTest {
     @Test
     @DisplayName("Test for User Exception")
     void getuserException() {
-        UserResponse userResponseExpected= new UserResponse(Messages.ERROR,Messages.DATA_NOT_FOUND,null,"","");
-        ResponseEntity<UserResponse> userResponseReal = userExceptions.getuserException(new UserExceptionMessage(Messages.DATA_NOT_FOUND));
+        UserResponse userResponseExpected= new UserResponse(Constants.ERROR, Constants.DATA_NOT_FOUND,null,"","");
+        ResponseEntity<UserResponse> userResponseReal = userExceptions.getuserException(new UserExceptionMessage(Constants.DATA_NOT_FOUND));
         Assertions.assertEquals(userResponseExpected.getMessage(),userResponseReal.getBody().getMessage());
         Assertions.assertEquals(userResponseExpected.getStatus(),userResponseReal.getBody().getStatus());
-        Assertions.assertEquals(null,userResponseReal.getBody().getUserEntity());
+        Assertions.assertEquals(null,userResponseReal.getBody().getUser());
         Assertions.assertEquals(HttpStatus.NOT_FOUND,userResponseReal.getStatusCode());
         }
 
     @Test
     @DisplayName("Test for User Caretaker Exception")
     void getcaretakerexception() {
-        CaretakerResponse caretakerResponseExpected = new CaretakerResponse(Messages.ERROR, Messages.DATA_NOT_FOUND, null);
-        ResponseEntity<CaretakerResponse> caretakerResponseReal = userExceptions.getcaretakerexception(new UserCaretakerException(Messages.DATA_NOT_FOUND));
+        CaretakerResponse caretakerResponseExpected = new CaretakerResponse(Constants.ERROR, Constants.DATA_NOT_FOUND, null);
+        ResponseEntity<CaretakerResponse> caretakerResponseReal = userExceptions.getcaretakerexception(new UserCaretakerException(Constants.DATA_NOT_FOUND));
         Assertions.assertEquals(caretakerResponseExpected.getMessage(),caretakerResponseReal.getBody().getMessage());
         Assertions.assertEquals(HttpStatus.NOT_FOUND,caretakerResponseReal.getStatusCode());
     }
 
     @Test
     void getCaretakerNotvalidExceptionConstraint() {
-        CaretakerResponse caretakerResponseExpected = new CaretakerResponse(Messages.ERROR, Messages.DATA_NOT_FOUND, null);
-        ResponseEntity<CaretakerResponse> caretakerResponseReal = userExceptions.getCaretakerNotvalidExceptionConstraint(new ConstraintViolationException(Messages.DATA_NOT_FOUND,null));
+        CaretakerResponse caretakerResponseExpected = new CaretakerResponse(Constants.ERROR, Constants.DATA_NOT_FOUND, null);
+        ResponseEntity<CaretakerResponse> caretakerResponseReal = userExceptions.getCaretakerNotvalidExceptionConstraint(new ConstraintViolationException(Constants.DATA_NOT_FOUND,null));
         Assertions.assertEquals(caretakerResponseExpected.getMessage(),caretakerResponseReal.getBody().getMessage());
     }
 
     @Test
     void getCaretakerNotvalidExceptionValidation() {
-        CaretakerResponse caretakerResponseExpected = new CaretakerResponse(Messages.ERROR, Messages.DATA_NOT_FOUND, null);
-        ResponseEntity<CaretakerResponse> caretakerResponseReal = userExceptions.getCaretakerNotvalidExceptionValidation(new ValidationException(Messages.DATA_NOT_FOUND));
+        CaretakerResponse caretakerResponseExpected = new CaretakerResponse(Constants.ERROR, Constants.DATA_NOT_FOUND, null);
+        ResponseEntity<CaretakerResponse> caretakerResponseReal = userExceptions.getCaretakerNotvalidExceptionValidation(new ValidationException(Constants.DATA_NOT_FOUND));
         Assertions.assertEquals(caretakerResponseExpected.getMessage(),caretakerResponseReal.getBody().getMessage());
         Assertions.assertEquals(HttpStatus.NOT_FOUND,caretakerResponseReal.getStatusCode());
     }
@@ -81,8 +77,8 @@ class UserExceptionsTest {
     @Test
     @DisplayName("Test for User Medicine Exception")
     void getUserMedicineException() {
-        MedicineResponse medicineResponseExpected = new MedicineResponse(Messages.ERROR, Messages.DATA_NOT_FOUND, null);
-        ResponseEntity<MedicineResponse> medicineResponseReal= userExceptions.getUserMedicineException(new UserMedicineException(Messages.DATA_NOT_FOUND));
+        MedicineResponse medicineResponseExpected = new MedicineResponse(Constants.ERROR, Constants.DATA_NOT_FOUND, null);
+        ResponseEntity<MedicineResponse> medicineResponseReal= userExceptions.getUserMedicineException(new UserMedicineException(Constants.DATA_NOT_FOUND));
         Assertions.assertEquals(medicineResponseExpected.getMessage(),medicineResponseReal.getBody().getMessage());
         Assertions.assertEquals(HttpStatus.NOT_FOUND,medicineResponseReal.getStatusCode());
     }

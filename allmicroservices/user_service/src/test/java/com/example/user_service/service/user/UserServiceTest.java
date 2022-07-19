@@ -1,22 +1,22 @@
-package com.example.userService;
+package com.example.user_service.service.user;
 
 import com.example.user_service.config.PdfMailSender;
-import com.example.user_service.exception.user.UserExceptionMessage;
-import com.example.user_service.exception.medicine.UserMedicineException;
-import com.example.user_service.model.medicine.MedicineHistory;
-import com.example.user_service.model.medicine.UserMedicines;
-import com.example.user_service.model.user.UserDetails;
-import com.example.user_service.model.user.UserEntity;
-import com.example.user_service.pojos.dto.user.UserDetailEntityDTO;
-import com.example.user_service.pojos.dto.user.UserEntityDTO;
-import com.example.user_service.pojos.dto.user.UserMailDTO;
-import com.example.user_service.pojos.dto.user.UserMedicineDTO;
-import com.example.user_service.pojos.response.user.UserDetailResponsePage;
-import com.example.user_service.pojos.response.user.UserResponse;
+import com.example.user_service.exception.UserExceptionMessage;
+import com.example.user_service.exception.UserMedicineException;
+import com.example.user_service.model.MedicineHistory;
+import com.example.user_service.model.UserMedicines;
+import com.example.user_service.model.UserDetails;
+import com.example.user_service.model.User;
+import com.example.user_service.pojos.request.UserDetailEntityDTO;
+import com.example.user_service.pojos.request.UserDTO;
+import com.example.user_service.pojos.request.UserMailDTO;
+import com.example.user_service.pojos.request.UserMedicineDTO;
+import com.example.user_service.pojos.response.UserDetailResponsePage;
+import com.example.user_service.pojos.response.UserResponse;
 import com.example.user_service.repository.UserDetailsRepository;
 import com.example.user_service.repository.UserMedicineRepository;
 import com.example.user_service.repository.UserRepository;
-import com.example.user_service.service.user.UserServiceImpl;
+import com.example.user_service.service.UserServiceImpl;
 import com.example.user_service.util.JwtUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +39,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
@@ -62,28 +63,27 @@ class UserServiceTest {
     private PdfMailSender pdfMailSender;
     @Mock
     private JwtUtil jwtUtil;
-    @Mock
-    private PasswordEncoder passwordEncoder;
-
     @BeforeEach
     public void initcase() {
-        userServiceImpl= new UserServiceImpl(userRepository,jwtUtil,userDetailsRepository,mapper,pdfMailSender,passwordEncoder,userMedicineRepository);
+        userServiceImpl= new UserServiceImpl(userRepository,jwtUtil,userDetailsRepository,mapper,pdfMailSender,userMedicineRepository);
     }
 
     @Test
     @DisplayName("Test for saving user successfully")
     void saveUserTest() throws UserExceptionMessage{
 
-        UserEntity user = new UserEntity("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
+        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
         UserResponse userResponse= new UserResponse("Failed","User is already present",new ArrayList<>(Arrays.asList(user)),null,null);
         when(userServiceImpl.getUserByEmail(user.getEmail())).thenReturn(null);
-        UserEntityDTO userEntityDTO= new UserEntityDTO("vinay","vinay@gmail.com");
-        when(mapper.map(userEntityDTO,UserEntity.class)).thenReturn(user);
-        when(jwtUtil.generateToken(user.getUserName())).thenReturn("fiasfiugaojfbjkabfk");
-        when(passwordEncoder.encode(user.getUserId())).thenReturn("ujagfgouiaetfiugljgb");
+        UserDTO userDTO = new UserDTO("vinay","vinay@gmail.com");
+        when(mapper.map(userDTO, User.class)).thenReturn(user);
+        when(jwtUtil.generateToken(user.getUserId())).thenReturn("fiasfiugaojfbjkabfk");
+        when(jwtUtil.generateRefreshToken(user.getUserId())).thenReturn("ujagfgouiaetfiugljgb");
         when(userRepository.save(user)).thenReturn(user);
-        UserResponse userResponse1= userServiceImpl.saveUser(userEntityDTO,"eafyigfiagf","sfhoshgouahgo");
-        Assertions.assertEquals(userResponse.getUserEntity().get(0).getUserName(),userResponse1.getUserEntity().get(0).getUserName());
+        UserResponse userResponse1= userServiceImpl.saveUser(userDTO,"eafyigfiagf","sfhoshgouahgo");
+        Assertions.assertEquals(userResponse.getUser().get(0).getUserName(),userResponse1.getUser().get(0).getUserName());
+        Assertions.assertEquals(userResponse.getUser().get(0).getUserId(),userResponse1.getUser().get(0).getUserId());
+        Assertions.assertEquals(userResponse.getUser().get(0).getEmail(),userResponse1.getUser().get(0).getEmail());
 
     }
 
@@ -91,24 +91,27 @@ class UserServiceTest {
     @DisplayName("Test for saving user while user exists")
     void saveUserTestUserExist() throws UserExceptionMessage{
 
-        UserEntity user = new UserEntity("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
+        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
         UserResponse userResponse= new UserResponse("Failed","User is already present",new ArrayList<>(Arrays.asList(user)),null,null);
-        UserEntityDTO userEntityDTO= new UserEntityDTO("vinay","vinay@gmail.com");
+        UserDTO userDTO = new UserDTO("vinay","vinay@gmail.com");
         when(userServiceImpl.getUserByEmail(user.getEmail())).thenReturn(user);
-        UserResponse userResponse1= userServiceImpl.saveUser(userEntityDTO,"eafyigfiagf","sfhoshgouahgo");
-        Assertions.assertEquals(userResponse.getUserEntity().get(0).getUserName(),userResponse1.getUserEntity().get(0).getUserName());
+        UserResponse userResponse1= userServiceImpl.saveUser(userDTO,"eafyigfiagf","sfhoshgouahgo");
+        Assertions.assertEquals(userResponse.getUser().get(0).getUserName(),userResponse1.getUser().get(0).getUserName());
+        Assertions.assertEquals(userResponse.getUser().get(0).getUserId(),userResponse1.getUser().get(0).getUserId());
+        Assertions.assertEquals(userResponse.getUser().get(0).getEmail(),userResponse1.getUser().get(0).getEmail());
+
     }
 
     @Test
     @DisplayName("Test for saving user exception")
     void saveUserInnerExcpetion(){
-        UserEntity user = new UserEntity("73578dfd-e7c9-4381-a348-113e72d80fa2",null,"vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
-        UserEntityDTO userEntityDTO= new UserEntityDTO("vinay","vinay@gmail.com");
+        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2",null,"vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
+        UserDTO userDTO = new UserDTO("vinay","vinay@gmail.com");
         when(userServiceImpl.getUserByEmail(any())).thenReturn(null);
-        when(mapper.map(userEntityDTO,UserEntity.class)).thenReturn(user);
+        when(mapper.map(userDTO, User.class)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(user);
         try{
-            userServiceImpl.saveUser(userEntityDTO,"eafyigfiagf","sfhoshgouahgo");
+            userServiceImpl.saveUser(userDTO,"eafyigfiagf","sfhoshgouahgo");
         }catch(UserExceptionMessage userExceptionMessage){
             Assertions.assertEquals("Error try again!",userExceptionMessage.getMessage());
         }
@@ -132,6 +135,11 @@ class UserServiceTest {
         when(userRepository.findAllUsers(paging)).thenReturn(userEntityPage);
         CompletableFuture<UserDetailResponsePage> userResponsePage1=userServiceImpl.getUsers(0,4);
         Assertions.assertEquals(3,userResponsePage1.get().getUsers().size());
+        Assertions.assertEquals(userEntityPage.get().collect(Collectors.toList()).get(0).getUserName(),userResponsePage1.get().getUsers().get(0).getUserName() );
+        Assertions.assertEquals(userEntityPage.get().collect(Collectors.toList()).get(0).getEmail(),userResponsePage1.get().getUsers().get(0).getEmail());
+        Assertions.assertEquals(userEntityPage.get().collect(Collectors.toList()).get(0).getBio(),userResponsePage1.get().getUsers().get(0).getBio() );
+        Assertions.assertEquals(userEntityPage.get().collect(Collectors.toList()).get(0).getGender(),userResponsePage1.get().getUsers().get(0).getGender() );
+        Assertions.assertEquals(userEntityPage.get().collect(Collectors.toList()).get(0).getAge(),userResponsePage1.get().getUsers().get(0).getAge());
     }
 
     @Test
@@ -152,17 +160,19 @@ class UserServiceTest {
 
     @Test
     void getUserByIdTest() throws UserExceptionMessage{
-        UserEntity userEntity = new UserEntity("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
-        when(userRepository.getUserById("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(userEntity);
-        UserEntity userEntity1 = userServiceImpl.getUserById("73578dfd-e7c9-4381-a348-113e72d80fa2");
-        Assertions.assertEquals(userEntity.getUserId(),userEntity1.getUserId());
+        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
+        when(userRepository.getUserById("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(user);
+        User user1 = userServiceImpl.getUserById("73578dfd-e7c9-4381-a348-113e72d80fa2");
+        Assertions.assertEquals(user.getUserId(), user1.getUserId());
+        Assertions.assertEquals(user.getUserName(),user1.getUserName());
+        Assertions.assertEquals(user.getEmail(),user1.getEmail());
     }
 
     @Test
     void getUserByIdTestException(){
         when(userRepository.getUserById("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(null);
         try{
-            UserEntity userEntity1 = userServiceImpl.getUserById("73578dfd-e7c9-4381-a348-113e72d80fa2");
+            User user1 = userServiceImpl.getUserById("73578dfd-e7c9-4381-a348-113e72d80fa2");
         } catch (UserExceptionMessage userExceptionMessage){
             Assertions.assertEquals("Data not found",userExceptionMessage.getMessage());
         }
@@ -174,6 +184,10 @@ class UserServiceTest {
         when(userRepository.getUserById1("a6bf0fef-01fd-465c-a901-a3b98f5c88b4")).thenReturn(userDetailEntityDTO);
         UserDetailEntityDTO userDetailEntityDTO1= userServiceImpl.getUserById1("a6bf0fef-01fd-465c-a901-a3b98f5c88b4");
         Assertions.assertEquals(userDetailEntityDTO.getUserName(),userDetailEntityDTO1.getUserName());
+        Assertions.assertEquals(userDetailEntityDTO.getAge(),userDetailEntityDTO1.getAge());
+        Assertions.assertEquals(userDetailEntityDTO.getGender(),userDetailEntityDTO1.getGender());
+        Assertions.assertEquals(userDetailEntityDTO.getBio(),userDetailEntityDTO1.getBio());
+        Assertions.assertEquals(userDetailEntityDTO.getEmail(),userDetailEntityDTO1.getEmail());
     }
 
     @Test
@@ -189,22 +203,22 @@ class UserServiceTest {
 
     @Test
     void getUserByNameTest() throws UserExceptionMessage {
-        UserEntity userEntity = new UserEntity("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
-        List<UserEntity> userEntities = new ArrayList<>();
-        userEntities.add(userEntity);
-        when(userRepository.findByNameIgnoreCase(userEntity.getUserName())).thenReturn(userEntities);
-        List<UserEntity> userEntities1 = userServiceImpl.getUserByName(userEntity.getUserName());
-        System.out.println(userEntities1);
+        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
+        List<User> userEntities = new ArrayList<>();
+        userEntities.add(user);
+        when(userRepository.findByNameIgnoreCase(user.getUserName())).thenReturn(userEntities);
+        List<User> userEntities1 = userServiceImpl.getUserByName(user.getUserName());
         Assertions.assertEquals(userEntities.get(0).getUserName(),userEntities1.get(0).getUserName());
-
+        Assertions.assertEquals(userEntities.get(0).getUserId(),userEntities1.get(0).getUserId());
+        Assertions.assertEquals(userEntities.get(0).getEmail(),userEntities1.get(0).getEmail());
     }
 
     @Test
     void getUserByNameTestException() {
-        List<UserEntity> userEntities = new ArrayList<>();
+        List<User> userEntities = new ArrayList<>();
         when(userRepository.findByNameIgnoreCase(any())).thenReturn(userEntities);
         try {
-            List<UserEntity> userEntities1 = userServiceImpl.getUserByName("vinay");
+            List<User> userEntities1 = userServiceImpl.getUserByName("vinay");
         }catch (UserExceptionMessage userExceptionMessage){
             Assertions.assertEquals("Data not found",userExceptionMessage.getMessage());
         }
@@ -216,6 +230,8 @@ class UserServiceTest {
         when(userRepository.findByMail1("vinay@gmail.com")).thenReturn(userMailDTO);
         UserMailDTO userMailDTO1= userServiceImpl.getUserByEmail1("vinay@gmail.com");
         Assertions.assertEquals(userMailDTO.getUserName(),userMailDTO1.getUserName());
+        Assertions.assertEquals(userMailDTO.getEmail(),userMailDTO1.getEmail());
+        Assertions.assertEquals(userMailDTO.getPicPath(),userMailDTO1.getPicPath());
     }
 
     @Test
@@ -232,21 +248,23 @@ class UserServiceTest {
 
     @Test
     void getUserByEmail() throws UserExceptionMessage {
-        UserEntity userEntity = new UserEntity("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
+        User userEntity = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
         when(userRepository.findByMail("vinay@gmail.com")).thenReturn(userEntity);
-        UserEntity user = userServiceImpl.getUserByEmail(userEntity.getEmail());
+        User user = userServiceImpl.getUserByEmail(userEntity.getEmail());
         Assertions.assertEquals(userEntity.getUserId(),user.getUserId());
+        Assertions.assertEquals(userEntity.getEmail(),user.getEmail());
+        Assertions.assertEquals(userEntity.getUserName(),user.getUserName());
     }
 
     @Test
     void sendUserMedicinesTest() throws UserExceptionMessage, FileNotFoundException {
-        UserEntity userEntity = new UserEntity("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
+        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
         MedicineHistory medicineHistory = new MedicineHistory(123,"2022-04-16T16:05:20.961Z","10:00 AM","8:00 PM",null);
         List<MedicineHistory> medicineHistoryList= new ArrayList<>();
         medicineHistoryList.add(medicineHistory);
-        Optional<UserMedicines> userMedicines= Optional.of(new UserMedicines(12345, "2022-04-16T16:05:20.961Z", "PCM", "for headache", "Mon", "2022-04-16T16:05:20.961Z", "10:00 AM", "10 AM", 12, 12, userEntity, medicineHistoryList, null));
+        Optional<UserMedicines> userMedicines= Optional.of(new UserMedicines(12345, "2022-04-16T16:05:20.961Z", "PCM", "for headache", "Mon", "2022-04-16T16:05:20.961Z", "10:00 AM", "10 AM", 12, 12, user, medicineHistoryList, null));
         when(userMedicineRepository.findById(12345)).thenReturn(userMedicines);
-        UserEntity entity= userMedicines.get().getUserEntity();
+        User entity= userMedicines.get().getUser();
         List<MedicineHistory> medicinesList= userMedicines.get().getMedicineHistories();
         String text= pdfMailSender.send(entity,userMedicines.get(),medicinesList);
         String text1= userServiceImpl.sendUserMedicines(12345);
@@ -255,7 +273,7 @@ class UserServiceTest {
 
     @Test
     void sendUserMedicinesExceptionTest() throws FileNotFoundException {
-        UserEntity userEntity = new UserEntity("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
+        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
         MedicineHistory medicineHistory = new MedicineHistory(123,"2022-04-16T16:05:20.961Z","10:00 AM","8:00 PM",null);
         List<MedicineHistory> medicineHistoryList= new ArrayList<>();
         medicineHistoryList.add(medicineHistory);
@@ -273,29 +291,32 @@ class UserServiceTest {
     void loginTest() throws UserExceptionMessage {
         String fcmToken = "";
         UserDetails userDetails= new UserDetails();
-        UserEntity userEntity = new UserEntity("73578dfd-e7c9-4381-a348-113e72d80fa2","Nikunj123","nikunj123@gmail.com", LocalDateTime.now(), LocalDateTime.now(),userDetails,null);
-        when(userServiceImpl.getUserByEmail(any())).thenReturn(userEntity);
+        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","Nikunj123","nikunj123@gmail.com", LocalDateTime.now(), LocalDateTime.now(),userDetails,null);
+        when(userServiceImpl.getUserByEmail(any())).thenReturn(user);
         userDetails.setFcmToken("afyuauvfiualfviuaofga");
         when(userDetailsRepository.save(userDetails)).thenReturn(userDetails);
-        String jwtToken= jwtUtil.generateToken(userEntity.getUserName());
-        String refreshToken = passwordEncoder.encode(userEntity.getUserId());
-        UserResponse userResponse= new UserResponse("Success", "Logged In",new ArrayList<>(Arrays.asList(userEntity)),jwtToken,refreshToken);
+        String jwtToken= jwtUtil.generateToken(user.getUserName());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUserId());
+        UserResponse userResponse= new UserResponse("Success", "Logged In",new ArrayList<>(Arrays.asList(user)),jwtToken,refreshToken);
         UserResponse userResponse1= userServiceImpl.login("nikunj123@gmail.com","afyuauvfiualfviuaofga");
-        Assertions.assertEquals(userResponse.getUserEntity().get(0).getUserId(),userResponse1.getUserEntity().get(0).getUserId());
+        Assertions.assertEquals(userResponse.getUser().get(0).getUserId(),userResponse1.getUser().get(0).getUserId());
+        Assertions.assertEquals(userResponse.getUser().get(0).getUserName(),userResponse1.getUser().get(0).getUserName());
+        Assertions.assertEquals(userResponse.getUser().get(0).getEmail(),userResponse1.getUser().get(0).getEmail());
+
     }
 
     @Test
     void loginExceptionTest(){
         String fcmToken = "";
         UserDetails userDetails= new UserDetails();
-        UserEntity userEntity = new UserEntity("73578dfd-e7c9-4381-a348-113e72d80fa2",null,"nikunj123@gmail.com", LocalDateTime.now(), LocalDateTime.now(),userDetails,null);
-        when(userServiceImpl.getUserByEmail(any())).thenReturn(userEntity);
+        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2",null,"nikunj123@gmail.com", LocalDateTime.now(), LocalDateTime.now(),userDetails,null);
+        when(userServiceImpl.getUserByEmail(any())).thenReturn(user);
         userDetails.setFcmToken("afyuauvfiualfviuaofga");
         when(userDetailsRepository.save(userDetails)).thenReturn(userDetails);
-        String jwtToken= jwtUtil.generateToken(userEntity.getUserName());
-        String refreshToken = passwordEncoder.encode(userEntity.getUserId());
+        String jwtToken= jwtUtil.generateToken(user.getUserName());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUserId());
         try{
-            userServiceImpl.login(userEntity.getEmail(),userEntity.getUserDetails().getFcmToken());
+            userServiceImpl.login(user.getEmail(), user.getUserDetails().getFcmToken());
         }catch (UserExceptionMessage userExceptionMessage){
             Assertions.assertEquals("Data not found",userExceptionMessage.getMessage());
         }
@@ -309,6 +330,11 @@ class UserServiceTest {
         when(userRepository.getUserMedicineById("a6bf0fef-01fd-465c-a901-a3b98f5c88b4")).thenReturn(medicineDTOList);
         List<UserMedicineDTO> userMedicineDTOS = userServiceImpl.getUserMedicineById("a6bf0fef-01fd-465c-a901-a3b98f5c88b4");
         Assertions.assertEquals(medicineDTOList.get(0).getMedicineName(),userMedicineDTOS.get(0).getMedicineName());
+        Assertions.assertEquals(medicineDTOList.get(0).getMedicineDes(),userMedicineDTOS.get(0).getMedicineDes());
+        Assertions.assertEquals(medicineDTOList.get(0).getDays(),userMedicineDTOS.get(0).getDays());
+        Assertions.assertEquals(medicineDTOList.get(0).getEndDate(),userMedicineDTOS.get(0).getEndDate());
+        Assertions.assertEquals(medicineDTOList.get(0).getStartDate(),userMedicineDTOS.get(0).getStartDate());
+
     }
 
     @Test

@@ -2,13 +2,15 @@ package com.example.user_service.util;
 
 import java.time.LocalDateTime;
 
+/**
+ * This class is for getting date and time
+ */
 public class Datehelper {
 
     Datehelper(){}
-    public static LocalDateTime getcurrentdatatime(){
+    public static LocalDateTime getCurrentDataTime(){
 
-        LocalDateTime now = LocalDateTime.now();
-        return (now);
+        return (LocalDateTime.now());
 
     }
 

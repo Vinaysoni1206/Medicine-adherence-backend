@@ -1,19 +1,20 @@
 package com.example.user_service.service.medicine;
 
-import com.example.user_service.exception.user.UserExceptionMessage;
-import com.example.user_service.exception.medicine.UserMedicineException;
-import com.example.user_service.model.image.Image;
-import com.example.user_service.model.medicine.MedicineHistory;
-import com.example.user_service.model.medicine.UserMedicines;
-import com.example.user_service.model.user.UserEntity;
-import com.example.user_service.pojos.dto.medicine.MedicineHistoryDTO;
-import com.example.user_service.pojos.dto.medicine.MedicinePojo;
-import com.example.user_service.pojos.response.medicine.MedicineResponse;
+import com.example.user_service.exception.UserExceptionMessage;
+import com.example.user_service.exception.UserMedicineException;
+import com.example.user_service.model.Image;
+import com.example.user_service.model.MedicineHistory;
+import com.example.user_service.model.UserMedicines;
+import com.example.user_service.model.User;
+import com.example.user_service.pojos.request.MedicineHistoryDTO;
+import com.example.user_service.pojos.request.MedicinePojo;
+import com.example.user_service.pojos.response.MedicineResponse;
 import com.example.user_service.repository.ImageRepository;
 import com.example.user_service.repository.UserMedHistoryRepository;
 import com.example.user_service.repository.UserMedicineRepository;
 import com.example.user_service.repository.UserRepository;
-import com.example.user_service.util.Messages;
+import com.example.user_service.service.UserMedicineServiceImpl;
+import com.example.user_service.util.Constants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,7 +69,7 @@ class UserMedicineServiceTest {
         UserMedicines userMedicines= new UserMedicines();
         List<UserMedicines> userMedicines1= new ArrayList<>();
         userMedicines1.add(userMedicines);
-        UserEntity user = new UserEntity("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,userMedicines1);
+        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,userMedicines1);
         when(userRepository.getUserById("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(user);
         CompletableFuture<List<UserMedicines>> listCompletableFuture= userMedicineServiceImpl.getAllUserMedicines("73578dfd-e7c9-4381-a348-113e72d80fa2");
         Assertions.assertEquals(1,listCompletableFuture.get().size());
@@ -78,7 +79,7 @@ class UserMedicineServiceTest {
     void synDataException() throws UserMedicineException {
         List<MedicinePojo> medicinePojoList = new ArrayList<>();
         List<UserMedicines> userMedicines1= new ArrayList<>();
-        UserEntity user = new UserEntity("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,userMedicines1);
+        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,userMedicines1);
         when(userRepository.getUserById("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(user);
         try{
             userMedicineServiceImpl.syncData("73578dfd-e7c9-4381-a348-113e72d80fa2",medicinePojoList);
@@ -94,14 +95,14 @@ class UserMedicineServiceTest {
         medicinePojoList.add(medicinePojo);
         List<MedicineHistory> medicineHistoryList = new ArrayList<>();
         List<UserMedicines> userMedicinesList= new ArrayList<>();
-        UserEntity user = new UserEntity("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,userMedicinesList);
+        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,userMedicinesList);
         UserMedicines userMedicines= new UserMedicines(123,"asjdjajd","PCM","something","Mon","fafafafa","10:00 AM","anything",12,5,user,medicineHistoryList,null);
         userMedicinesList.add(userMedicines);
         MedicineHistory medicineHistory= new MedicineHistory(123,null,"10:00 AM",null,null);
         medicineHistoryList.add(medicineHistory);
         when(userRepository.getUserById("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(user);
         String value =userMedicineServiceImpl.syncData("73578dfd-e7c9-4381-a348-113e72d80fa2",medicinePojoList);
-        Assertions.assertEquals(Messages.SUCCESS,value);
+        Assertions.assertEquals(Constants.SUCCESS,value);
     }
 
     @Test
@@ -116,7 +117,7 @@ class UserMedicineServiceTest {
 
     @Test
     void syncMedicineHistoryTest() throws UserMedicineException {
-        UserEntity user = new UserEntity("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
+        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
         MedicineHistory medicineHistory= new MedicineHistory(123,null,"10:00 AM",null,null);
         List<MedicineHistory> medicineHistoryList = new ArrayList<>();
         medicineHistoryList.add(medicineHistory);
@@ -140,7 +141,7 @@ class UserMedicineServiceTest {
 
     @Test
     void getMedicineHistoryException(){
-        UserEntity user= new UserEntity();
+        User user= new User();
         List<MedicineHistory> medicineHistoryList= Collections.emptyList();
         UserMedicines userMedicines= new UserMedicines(123,"asjdjajd","PCM","something","Mon","fafafafa","10:00 AM","anything",12,5,user,medicineHistoryList,null);
         when(userMedicineRepository.getMedById(123)).thenReturn(userMedicines);
@@ -153,7 +154,7 @@ class UserMedicineServiceTest {
 
     @Test
     void getMedicineHistoryTest() throws UserMedicineException {
-        UserEntity user = new UserEntity("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
+        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
         MedicineHistory medicineHistory= new MedicineHistory(123,null,"10:00 AM",null,null);
         List<MedicineHistory> medicineHistoryList = new ArrayList<>();
         medicineHistoryList.add(medicineHistory);
@@ -161,11 +162,12 @@ class UserMedicineServiceTest {
         when(userMedicineRepository.getMedById(123)).thenReturn(userMedicines);
         MedicineResponse medicineResponse= userMedicineServiceImpl.getMedicineHistory(123);
         Assertions.assertEquals(medicineHistoryList.size(),medicineResponse.getUserMedicinesList().size());
+        Assertions.assertEquals(medicineHistoryList.get(0).getHistoryId(),medicineResponse.getUserMedicinesList().get(0).getHistoryId());
     }
 
     @Test
     void getUserMedicneImagesTest(){
-        UserEntity user= new UserEntity();
+        User user= new User();
         Image image= new Image();
         List<Image> imageList= new ArrayList<>();
         imageList.add(image);
@@ -174,5 +176,6 @@ class UserMedicineServiceTest {
         when(userMedicineRepository.getMedById(123)).thenReturn(userMedicines);
         List<Image> imageList1= userMedicineServiceImpl.getUserMedicineImages(123);
         Assertions.assertEquals(imageList.size(),imageList1.size());
+        Assertions.assertEquals(imageList.get(0).getImageId(),imageList1.get(0).getImageId());
     }
 }

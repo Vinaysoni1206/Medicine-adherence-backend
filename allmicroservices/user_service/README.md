@@ -4,6 +4,28 @@ Medicine Adherence Application
 We would like to create an APP for users which will serve as a medicine adherence module.
 Many of the diseases require the patient to take medicines at a regular interval. Some of the diseases like BP, Diabetes, Tuberculosis have really strict norms about taking medicines. In case the medicine is not taken in time then the patient’s health is impacted negatively. 
 
+## Project Structure
+```
+user_service
+│  └───src
+│    └───main
+│     │   └───java
+│     │   │     └───com.example.user_service
+│     │   │         └───annotations
+│     │   │         └───config
+│     │   │         └───controller
+│     │   │         └───excecption
+│     │   │         └───model
+│     │   │         └───pojos
+│     │   │         └───repository
+│     │   │         └───security
+│     │   │         └───service
+│     │   │         └───util
+│     │   │         └───EventFinderBackendApplication.java
+│     │   └───resources
+│     │       └─── application.properties
+└───...
+```
 ## Getting Started
 
 ### Prerequisites
