@@ -7,15 +7,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.example.user_service.util.Constants.NullEmptyConstants.USER_EMAIL_EMPTY;
-import static com.example.user_service.util.Constants.NullEmptyConstants.USER_NAME_EMPTY;
 
-
-//@NamedNativeQuery(name = "UserEntity.getUserById1",
+//@NamedNativeQuery(name = "UserEntity.getUserByIdCustom",
 //query = "Select u.user_name as userName, u.email as email from user u where u.user_id = ?1",resultSetMapping = "Mapping.UserEntityDTO")
 //@SqlResultSetMapping(name = "Mapping.UserEntityDTO",classes = @ConstructorResult(targetClass = UserEntityDTO.class,columns = {@ColumnResult(name = "userName"),@ColumnResult(name = "email")}))
 
@@ -41,11 +37,9 @@ public class User {
   private String userId;
 
   @Column(name = "user_name",nullable = false)
-  @NotEmpty(message = USER_NAME_EMPTY)
   private String userName;
 
   @Column(name = "email",nullable = false)
-  @NotEmpty(message = USER_EMAIL_EMPTY)
   private String email;
 
   @Column(name = "last_login",nullable = false)

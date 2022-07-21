@@ -1,6 +1,7 @@
-package com.example.user_service.service;
+package com.example.user_service.service.impl;
 
 
+import com.example.user_service.exception.ResourceNotFoundException;
 import com.example.user_service.exception.UserCaretakerException;
 import com.example.user_service.exception.UserExceptionMessage;
 import com.example.user_service.model.Image;
@@ -13,6 +14,7 @@ import com.example.user_service.pojos.response.CaretakerResponsePage;
 import com.example.user_service.repository.ImageRepository;
 import com.example.user_service.repository.UserCaretakerRepository;
 import com.example.user_service.repository.UserMedicineRepository;
+import com.example.user_service.service.CareTakerService;
 import com.example.user_service.util.Datehelper;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -64,9 +66,11 @@ public class CareTakerServiceImpl implements CareTakerService {
     public UserCaretaker saveCareTaker(UserCaretakerDTO userCaretakerDTO) throws UserCaretakerException {
 
         logger.info(STARTING_METHOD_EXECUTION);
+        logger.info("Saving a caretaker with details: {}", userCaretakerDTO);
             UserCaretaker userCaretaker = mapToEntity(userCaretakerDTO);
             userCaretaker.setCreatedAt(Datehelper.getCurrentDataTime());
             if (userCaretakerRepository.check(userCaretaker.getPatientId(), userCaretaker.getCaretakerId()) != null) {
+                logger.debug("Caretaker already added");
                 throw new UserCaretakerException(CARETAKER_ALREADY_PRESENT);
             } else {
                 logger.info(RESPONSE_SAVED);
@@ -84,7 +88,7 @@ public class CareTakerServiceImpl implements CareTakerService {
                 logger.info("Caretaker not found with cId : {}",caretakerId);
                 throw new UserCaretakerException(NO_RECORD_FOUND);
             }
-            uc.setReqStatus(true);
+            uc.setRequestStatus(true);
         logger.info(RESPONSE_SAVED);
         userCaretakerRepository.save(uc);
         logger.info(EXITING_METHOD_EXECUTION);
@@ -92,36 +96,41 @@ public class CareTakerServiceImpl implements CareTakerService {
     }
 
     @Override
-    public CaretakerResponsePage getPatientsUnderMe(String userId, int pageNo, int pageSize) throws UserCaretakerException {
+    public CaretakerResponsePage getPatientsUnderMe(String userId, int pageNo, int pageSize) throws UserCaretakerException, ResourceNotFoundException {
 
         logger.info(STARTING_METHOD_EXECUTION);
+        logger.info("Fetching patients for a caretaker with id : {}",userId);
             Pageable pageable= PageRequest.of(pageNo,pageSize);
             Page<UserCaretaker> userCaretakerPage = userCaretakerRepository.getPatientsUnderMe(userId, pageable);
             if (userCaretakerPage.isEmpty()) {
                 logger.debug("No patients found for userID : {}",userId);
-                throw new UserCaretakerException(DATA_NOT_FOUND);
+                throw new ResourceNotFoundException(PATIENTS_NOT_FOUND);
             }
         logger.info(EXITING_METHOD_EXECUTION);
         return new CaretakerResponsePage(SUCCESS,DATA_FOUND,userCaretakerPage.getTotalElements(),userCaretakerPage.getTotalPages(),pageNo,userCaretakerPage.getContent());
     }
 
     @Override
-    public List<UserCaretaker> getPatientRequests(String userId) throws UserCaretakerException {
+    public List<UserCaretaker> getPatientRequests(String userId) throws UserCaretakerException, ResourceNotFoundException {
         logger.info(STARTING_METHOD_EXECUTION);
+        logger.info("Fetching list of patient requests send to a caretaker with id : {}",userId);
             List<UserCaretaker> userCaretaker =userCaretakerRepository.getPatientRequests(userId);
             if (userCaretaker.isEmpty()) {
-                throw new UserCaretakerException(DATA_NOT_FOUND);
+                logger.debug("No patient request found for id : {}", userId);
+                throw new ResourceNotFoundException(PATIENT_REQUEST_NOT_FOUND);
             }
         logger.info(EXITING_METHOD_EXECUTION);
         return userCaretaker;
     }
 
     @Override
-    public List<UserCaretaker> getMyCaretakers(String userId) throws UserCaretakerException {
+    public List<UserCaretaker> getMyCaretakers(String userId) throws UserCaretakerException, ResourceNotFoundException {
         logger.info(STARTING_METHOD_EXECUTION);
+        logger.info("Fetching list of caretakers for id : {}", userId);
             List<UserCaretaker> userCaretaker = userCaretakerRepository.getMyCaretakers(userId);
             if (userCaretaker.isEmpty()) {
-                throw new UserCaretakerException(DATA_NOT_FOUND);
+                logger.debug("No Caretakers found for id : {}", userId);
+                throw new ResourceNotFoundException(CARETAKERS_NOT_FOUND);
             }
         logger.info(EXITING_METHOD_EXECUTION);
         return userCaretaker;
@@ -131,9 +140,11 @@ public class CareTakerServiceImpl implements CareTakerService {
     public List<UserCaretaker> getCaretakerRequestStatus(String userId) throws UserCaretakerException {
 
         logger.info(STARTING_METHOD_EXECUTION);
+        logger.info("Updating Caretaker status for id : {}",userId);
         List<UserCaretaker> userCaretakerList= userCaretakerRepository.getCaretakerRequestStatus(userId);
             if(userCaretakerList.isEmpty()){
-                throw new UserCaretakerException(NO_RECORD_FOUND);
+                logger.debug("Caretaker request not found for id :{}",userId);
+                throw new UserCaretakerException(REQUEST_NOT_FOUND);
             }
         logger.info(EXITING_METHOD_EXECUTION);
         return userCaretakerList;
@@ -144,26 +155,29 @@ public class CareTakerServiceImpl implements CareTakerService {
     public List<UserCaretaker> getCaretakerRequests(String userId) throws UserCaretakerException {
 
         logger.info(STARTING_METHOD_EXECUTION);
+        logger.info("Fetching caretaker request send to a patient for id : {}", userId);
         List<UserCaretaker> userCaretaker = userCaretakerRepository.getCaretakerRequests(userId);
             if (userCaretaker.isEmpty()) {
-                throw new UserCaretakerException(DATA_NOT_FOUND);
+                throw new UserCaretakerException(REQUEST_NOT_FOUND);
             }
         logger.info(EXITING_METHOD_EXECUTION);
         return userCaretaker;
     }
 
     @Override
-    public String delPatientReq(String caretakerId) throws UserExceptionMessage, UserCaretakerException {
+    public String deletePatientRequest(String caretakerId) throws UserCaretakerException {
 
         logger.info(STARTING_METHOD_EXECUTION);
+        logger.info("Deleting patient request for a caretaker with id : {}",caretakerId);
         Optional<UserCaretaker> userCaretaker = userCaretakerRepository.findById(caretakerId);
             if (userCaretaker.isPresent()) {
                 userCaretaker.get().setDelete(true);
+                userCaretakerRepository.save(userCaretaker.get());
                 logger.info(EXITING_METHOD_EXECUTION);
                 return SUCCESS;
-
             }
-            throw new UserCaretakerException(NO_RECORD_FOUND);
+            logger.debug("Request not found for id : {}",caretakerId);
+            throw new UserCaretakerException(REQUEST_NOT_FOUND);
     }
 
     @Override
@@ -175,7 +189,7 @@ public class CareTakerServiceImpl implements CareTakerService {
 
             UserMedicines userMedicines = userMedicineRepository.getMedById(medId);
             if(userMedicines.getUser()==null){
-                throw new UserCaretakerException(DATA_NOT_FOUND);
+                throw new ResourceNotFoundException(NO_RECORD_FOUND);
             }
             String userName = userMedicines.getUser().getUserName();
             Image image = new Image();
@@ -199,6 +213,7 @@ public class CareTakerServiceImpl implements CareTakerService {
     private UserCaretaker mapToEntity(UserCaretakerDTO userCaretakerDTO) {
 
         logger.info(EXITING_METHOD_EXECUTION);
+        logger.info("Mapping DTO to Entity");
         return mapper.map(userCaretakerDTO, UserCaretaker.class);
 
     }

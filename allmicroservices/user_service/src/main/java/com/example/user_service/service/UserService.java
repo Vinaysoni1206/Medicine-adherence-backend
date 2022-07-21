@@ -1,11 +1,11 @@
 package com.example.user_service.service;
 
+import com.example.user_service.exception.ResourceNotFoundException;
 import com.example.user_service.exception.UserExceptionMessage;
 import com.example.user_service.exception.UserMedicineException;
 import com.example.user_service.model.User;
 import com.example.user_service.pojos.request.UserDetailEntityDTO;
 import com.example.user_service.pojos.request.UserDTO;
-import com.example.user_service.pojos.request.UserMailDTO;
 import com.example.user_service.pojos.request.UserMedicineDTO;
 import com.example.user_service.pojos.response.RefreshTokenResponse;
 import com.example.user_service.pojos.response.UserResponse;
@@ -23,25 +23,25 @@ import java.util.concurrent.ExecutionException;
  */
 public interface UserService {
 
-     UserResponse saveUser(UserDTO userDTO, String fcmToken, String picPath) throws UserExceptionMessage;
+     UserResponse saveUser(UserDTO userDTO, String fcmToken, String picPath) throws UserExceptionMessage, ResourceNotFoundException;
 
-     CompletableFuture<UserDetailResponsePage> getUsers(int pageNo, int pageSize) throws UserExceptionMessage;
+     CompletableFuture<UserDetailResponsePage> getUsers(int pageNo, int pageSize) throws UserExceptionMessage, ResourceNotFoundException;
 
-     User getUserById(String userId) throws UserExceptionMessage, UserMedicineException, ExecutionException, InterruptedException;
+     User getUserById(String userId) throws UserExceptionMessage, UserMedicineException, ExecutionException, InterruptedException, ResourceNotFoundException;
 
-     List<User> getUserByName(String userName)throws UserExceptionMessage;
+     List<User> getUserByName(String userName) throws UserExceptionMessage, ResourceNotFoundException;
 
-     UserMailDTO getUserByEmail1(String email) throws UserExceptionMessage;
+     User getUserByEmailCustom(String email) throws UserExceptionMessage, ResourceNotFoundException;
 
      User getUserByEmail(String email) throws UserExceptionMessage;
 
-     String sendUserMedicines(Integer userId) throws MessagingException, IOException, UserExceptionMessage;
+     String sendUserMedicines(Integer userId) throws MessagingException, IOException, UserExceptionMessage, ResourceNotFoundException;
 
-     UserResponse login(String mail , String fcmToken) throws UserExceptionMessage;
+     UserResponse login(String mail , String fcmToken) throws UserExceptionMessage, ResourceNotFoundException;
 
-     UserDetailEntityDTO getUserById1(String userId) throws UserExceptionMessage, UserMedicineException, ExecutionException, InterruptedException;
+     UserDetailEntityDTO getUserByIdCustom(String userId) throws UserExceptionMessage, UserMedicineException, ExecutionException, InterruptedException, ResourceNotFoundException;
 
      List<UserMedicineDTO> getUserMedicineById(String userId) throws UserExceptionMessage, UserMedicineException, ExecutionException, InterruptedException;
 
-     RefreshTokenResponse getRefreshToken(HttpServletRequest token) throws UserExceptionMessage;
+     RefreshTokenResponse getRefreshToken(HttpServletRequest token,String userId) throws UserExceptionMessage, ResourceNotFoundException;
 }

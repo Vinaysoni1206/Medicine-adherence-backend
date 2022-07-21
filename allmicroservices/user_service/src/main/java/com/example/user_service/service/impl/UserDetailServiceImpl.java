@@ -1,11 +1,13 @@
-package com.example.user_service.service;
+package com.example.user_service.service.impl;
 
+import com.example.user_service.exception.ResourceNotFoundException;
 import com.example.user_service.exception.UserExceptionMessage;
 import com.example.user_service.model.UserDetails;
 import com.example.user_service.model.User;
 import com.example.user_service.pojos.request.UserDetailsDTO;
 import com.example.user_service.repository.UserDetailsRepository;
 import com.example.user_service.repository.UserRepository;
+import com.example.user_service.service.UserDetailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -32,11 +34,13 @@ public class UserDetailServiceImpl implements UserDetailService {
         this.userRepository= userRepository;
     }
     @Override
-    public UserDetails saveUserDetail(String id, UserDetailsDTO userDetailsDTO) throws UserExceptionMessage {
+    public UserDetails saveUserDetail(String id, UserDetailsDTO userDetailsDTO) throws UserExceptionMessage, ResourceNotFoundException {
         logger.info(STARTING_METHOD_EXECUTION);
+        logger.info("Saving user details for user id : {}",id);
             Optional<User> user = Optional.ofNullable(userRepository.getUserById(id));
             if (user.isEmpty()) {
-                throw new UserExceptionMessage(DATA_NOT_FOUND);
+                logger.debug("User not found for id : {}",id);
+                throw new ResourceNotFoundException(USER_NOT_FOUND);
             }
             UserDetails userDetails1 = user.get().getUserDetails();
 

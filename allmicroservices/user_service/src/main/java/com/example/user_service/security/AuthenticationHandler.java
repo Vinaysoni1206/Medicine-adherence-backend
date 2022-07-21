@@ -30,7 +30,6 @@ public class AuthenticationHandler implements HandlerInterceptor {
     }
 
     public AuthenticationHandler() {
-
     }
 
     @Override

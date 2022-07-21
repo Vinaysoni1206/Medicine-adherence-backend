@@ -7,10 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
-
-import static com.example.user_service.util.Constants.NullEmptyConstants.*;
 
 /**
  * This is an entity for caretaker
@@ -19,32 +16,29 @@ import static com.example.user_service.util.Constants.NullEmptyConstants.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "my_caretakers",indexes = @Index(name = "inedx_fn",columnList = "c_id"))
+@Table(name = "my_caretakers",indexes = @Index(name = "inedx_fn",columnList = "request_id"))
 public class UserCaretaker {
 
     @Id
-    @Column(name = "c_id",nullable = false)
+    @Column(name = "request_id",nullable = false)
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(
             name = "UUID",
             strategy = "org.hibernate.id.UUIDGenerator"
     )
-    private String cId;
+    private String requestId;
 
     @Column(name = "patient_name",nullable = false,length = 70)
-    @NotEmpty(message = PATIENT_NAME_EMPTY)
     private String patientName;
 
-    @Column(name = "req_status",nullable = false)
+    @Column(name = "request_status",nullable = false)
     @Type(type = "org.hibernate.type.NumericBooleanType")
-    private boolean reqStatus;
+    private boolean requestStatus;
 
     @Column(name = "caretaker_id",nullable = false)
-    @NotEmpty(message = CARETAKER_ID_EMPTY)
     private String caretakerId;
 
     @Column(name = "patient_id",nullable = false)
-    @NotEmpty(message = PATIENT_ID_EMPTY)
     private String patientId;
 
     @Column(name = "caretaker_username",nullable = false,length = 70)
@@ -54,7 +48,6 @@ public class UserCaretaker {
     private LocalDateTime createdAt;
 
     @Column(name = "sent_by",nullable = false,length = 4)
-    @NotEmpty(message = SENT_BY_EMPTY)
     private String sentBy;
 
     @Column(name = "delete",nullable = false)

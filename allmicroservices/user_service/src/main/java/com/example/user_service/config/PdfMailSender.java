@@ -45,7 +45,7 @@ public class PdfMailSender {
                 "            </div><br>\n" +
                 "            <div style='font-size:24px; margin-bottom: 8px;font-weight: 600; color: gray;'>Medicine Details </div>\n" +
                 "                  <span>Name - " + userMedicines.getMedicineName() + SPAN +
-                "             <span>Description -" + userMedicines.getMedicineDes() + SPAN +
+                "             <span>Description -" + userMedicines.getMedicineDescription() + SPAN +
                 "                 <span>Start Date - " + userMedicines.getStartDate() + SPAN +
                 "                  <span>End Date - " + userMedicines.getEndDate() + SPAN +
                 "                  <span>Days - " + userMedicines.getDays() + SPAN +

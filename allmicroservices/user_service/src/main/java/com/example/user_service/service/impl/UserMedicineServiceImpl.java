@@ -1,4 +1,4 @@
-package com.example.user_service.service;
+package com.example.user_service.service.impl;
 
 import com.example.user_service.exception.UserExceptionMessage;
 import com.example.user_service.exception.UserMedicineException;
@@ -13,6 +13,7 @@ import com.example.user_service.repository.ImageRepository;
 import com.example.user_service.repository.UserMedHistoryRepository;
 import com.example.user_service.repository.UserMedicineRepository;
 import com.example.user_service.repository.UserRepository;
+import com.example.user_service.service.UserMedicineService;
 import com.example.user_service.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ public class UserMedicineServiceImpl implements UserMedicineService {
 
     final ImageRepository imageRepository;
 
-    final UserMedHistoryRepository userMedHistoryRepository;
+    final UserMedHistoryRepository userMedicineHistoryRepository;
 
     Logger logger = LoggerFactory.getLogger(UserMedicineServiceImpl.class);
 
@@ -47,17 +48,19 @@ public class UserMedicineServiceImpl implements UserMedicineService {
         this.userRepository=userRepository;
         this.userMedicineRepository=userMedicineRepository;
         this.imageRepository=imageRepository;
-        this.userMedHistoryRepository= userMedHistoryRepository;
+        this.userMedicineHistoryRepository = userMedHistoryRepository;
     }
 
 
     @Override
     @Async
-    public CompletableFuture<List<UserMedicines>> getAllUserMedicines(String userId) throws UserMedicineException, UserExceptionMessage {
+    public CompletableFuture<List<UserMedicines>> getAllUserMedicines(String userId) throws UserExceptionMessage {
         logger.info(STARTING_METHOD_EXECUTION);
+        logger.info("Fetching list of medicines for user with id : {}",userId);
         User user = userRepository.getUserById(userId);
             if (user == null) {
-                throw new UserExceptionMessage(DATA_NOT_FOUND);
+                logger.debug("User not found with id : {}",userId);
+                throw new UserExceptionMessage(USER_NOT_FOUND);
             }
             List<UserMedicines> list = user.getUserMedicines();
             logger.info(EXITING_METHOD_EXECUTION);
@@ -71,14 +74,16 @@ public class UserMedicineServiceImpl implements UserMedicineService {
     public String syncData(String userId, List<MedicinePojo> medicinePojo) throws UserMedicineException {
 
         logger.info(STARTING_METHOD_EXECUTION);
+        logger.info("Syncing data for user with id : {}",userId);
         User user = userRepository.getUserById(userId);
             if (user.getUserMedicines().isEmpty()) {
+                logger.debug("Unable to sync, medicine not found");
                 throw new UserMedicineException(UNABLE_TO_SYNC);
             }
             List<UserMedicines> userMedicinesList = medicinePojo.stream().map(medicinePojo1 -> {
                     UserMedicines userMedicines = new UserMedicines();
 
-                    userMedicines.setMedicineDes(medicinePojo1.getMedicineDes());
+                    userMedicines.setMedicineDescription(medicinePojo1.getMedicineDescription());
                     userMedicines.setMedicineName(medicinePojo1.getMedicineName());
                     userMedicines.setDays(medicinePojo1.getDays());
                     userMedicines.setMedicineId(medicinePojo1.getUserId());
@@ -102,35 +107,39 @@ public class UserMedicineServiceImpl implements UserMedicineService {
 
     @Override
 
-    public MedicineResponse syncMedicineHistory(Integer medId, List<MedicineHistoryDTO> medicineHistoryDTOS) throws UserMedicineException {
+    public MedicineResponse syncMedicineHistory(Integer medicineId, List<MedicineHistoryDTO> medicineHistoryDTOS) throws UserMedicineException {
 
         logger.info(STARTING_METHOD_EXECUTION);
-        UserMedicines userMedicines = userMedicineRepository.getMedById(medId);
+        logger.info("Syncing medicine history for user with medicineId : {}",medicineId);
+        UserMedicines userMedicines = userMedicineRepository.getMedById(medicineId);
             if (userMedicines == null) {
-                throw new UserMedicineException("Unable to sync");
+                logger.debug("Unable to sync , medicine list empty");
+                throw new UserMedicineException(UNABLE_TO_SYNC);
 
             }
-            List<MedicineHistory> medicineHistories = medicineHistoryDTOS.stream().map(medHid -> {
+            List<MedicineHistory> medicineHistories = medicineHistoryDTOS.stream().map(medicineHistoryId -> {
                 MedicineHistory medicineHistory1 = new MedicineHistory();
-                medicineHistory1.setHistoryId(medHid.getRemId());
-                medicineHistory1.setDate(medHid.getDate());
-                medicineHistory1.setTaken(String.join(",", medHid.getTaken()));
-                medicineHistory1.setNotTaken(String.join(",", medHid.getNotTaken()));
+                medicineHistory1.setHistoryId(medicineHistoryId.getReminderId());
+                medicineHistory1.setDate(medicineHistoryId.getDate());
+                medicineHistory1.setTaken(String.join(",", medicineHistoryId.getTaken()));
+                medicineHistory1.setNotTaken(String.join(",", medicineHistoryId.getNotTaken()));
                 medicineHistory1.setUserMedicines(userMedicines);
                 return medicineHistory1;
             }).collect(Collectors.toList());
-            CompletableFuture.completedFuture(userMedHistoryRepository.saveAll(medicineHistories));
+            CompletableFuture.completedFuture(userMedicineHistoryRepository.saveAll(medicineHistories));
         logger.info(EXITING_METHOD_EXECUTION);
         return new MedicineResponse(SUCCESS,DATA_FOUND,medicineHistories);
 
     }
 
     @Override
-    public MedicineResponse getMedicineHistory(Integer medId) throws UserMedicineException {
+    public MedicineResponse getMedicineHistory(Integer medicineId) throws UserMedicineException {
         logger.info(STARTING_METHOD_EXECUTION);
-        List<MedicineHistory> medicineHistories = userMedicineRepository.getMedById(medId).getMedicineHistories();
+        logger.info("Fetching medicine history with medicineId : {}", medicineId);
+        List<MedicineHistory> medicineHistories = userMedicineRepository.getMedById(medicineId).getMedicineHistories();
             if (medicineHistories.isEmpty()) {
-                throw new UserMedicineException(NO_RECORD_FOUND);
+                logger.debug("Medicines not found");
+                throw new UserMedicineException(MEDICINES_NOT_FOUND);
             }
         logger.info(EXITING_METHOD_EXECUTION);
         return new MedicineResponse("OK", "Medicine History", medicineHistories);
@@ -138,11 +147,12 @@ public class UserMedicineServiceImpl implements UserMedicineService {
     }
 
     @Override
-    public List<Image> getUserMedicineImages(Integer medId) {
+    public List<Image> getUserMedicineImages(Integer medicineId) {
 
         logger.info(STARTING_METHOD_EXECUTION);
+        logger.info("Fetching medicine images for a user with medicineId : {}", medicineId);
         logger.info(EXITING_METHOD_EXECUTION);
-        return userMedicineRepository.getMedById(medId)
+        return userMedicineRepository.getMedById(medicineId)
                     .getImages()
                     .stream()
                     .sorted(Comparator.comparing(Image::getDate).reversed())

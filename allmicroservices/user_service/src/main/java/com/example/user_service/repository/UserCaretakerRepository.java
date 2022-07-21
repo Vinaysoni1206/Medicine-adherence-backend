@@ -11,19 +11,19 @@ import java.util.List;
 public interface UserCaretakerRepository extends JpaRepository<UserCaretaker, String> {
 
 
-    @Query("SELECT u from UserCaretaker u where u.reqStatus=true and u.caretakerId = ?1")
+    @Query("SELECT u from UserCaretaker u where u.requestStatus=true and u.caretakerId = ?1")
     Page<UserCaretaker> getPatientsUnderMe(String id, Pageable pageable);
 
-    @Query("select u from UserCaretaker u where u.reqStatus=false and u.caretakerId = ?1")
+    @Query("select u from UserCaretaker u where u.requestStatus=false and u.caretakerId = ?1")
     List<UserCaretaker> getPatientRequests(String id);
 
-    @Query("SELECT u from UserCaretaker u where u.reqStatus=true and u.patientId = ?1")
+    @Query("SELECT u from UserCaretaker u where u.requestStatus=true and u.patientId = ?1")
     List<UserCaretaker> getMyCaretakers(String id);
 
-    @Query("select u from UserCaretaker u where u.reqStatus=false and u.patientId = ?1")
+    @Query("select u from UserCaretaker u where u.requestStatus=false and u.patientId = ?1")
     List<UserCaretaker> getCaretakerRequestStatus(String id);
 
-    @Query("select u from UserCaretaker u where u.sentBy='c' and u.patientId= ?1 and u.reqStatus=false")
+    @Query("select u from UserCaretaker u where u.sentBy='c' and u.patientId= ?1 and u.requestStatus=false")
     List<UserCaretaker> getCaretakerRequests(String userId);
 
     @Query("select u from UserCaretaker u where u.patientId=?1 and u.caretakerId=?2")

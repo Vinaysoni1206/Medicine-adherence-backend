@@ -7,10 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 import java.util.Date;
-
-import static com.example.user_service.util.Constants.NullEmptyConstants.CARETAKER_NAME_EMPTY;
 
 /**
  * This is entity class for image
@@ -19,7 +16,7 @@ import static com.example.user_service.util.Constants.NullEmptyConstants.CARETAK
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "image", indexes = @Index(name = "index_imgId" , columnList = "image_id"))
+@Table(name = "image", indexes = @Index(name = "index_image_id" , columnList = "image_id"))
 public class   Image {
 
     @Id
@@ -40,7 +37,6 @@ public class   Image {
     private String time;
 
     @Column(name = "caretaker_name",nullable = false,length = 60)
-    @NotEmpty(message = CARETAKER_NAME_EMPTY)
     private String caretakerName;
 
     @Column(name = "image_url",nullable = false,length = 100)
@@ -48,7 +44,7 @@ public class   Image {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(
-            name = "medimage_id",
+            name = "medicine_image_id",
             referencedColumnName = "medicine_id"
     )
     @JsonIgnore

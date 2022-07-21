@@ -21,10 +21,10 @@ public interface UserMedicineService {
 
     String syncData(String userId , List<MedicinePojo> list) throws UserMedicineException;
 
-    MedicineResponse syncMedicineHistory(Integer medId , List<MedicineHistoryDTO> medicineHistoryDTOS) throws UserMedicineException;
+    MedicineResponse syncMedicineHistory(Integer medicineId , List<MedicineHistoryDTO> medicineHistoryDTOS) throws UserMedicineException;
 
-    MedicineResponse getMedicineHistory(Integer medId) throws UserMedicineException;
+    MedicineResponse getMedicineHistory(Integer medicineId) throws UserMedicineException;
 
-    List<Image> getUserMedicineImages(Integer medId);
+    List<Image> getUserMedicineImages(Integer medicineId);
 
 }

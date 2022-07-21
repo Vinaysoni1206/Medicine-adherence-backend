@@ -1,8 +1,6 @@
 package com.example.user_service.annotations;
 
-import com.example.user_service.annotations.ImageValidation;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 

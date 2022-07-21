@@ -5,11 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-
-import static com.example.user_service.util.Constants.NullEmptyConstants.*;
-
 /**
  * This is an entity for medicine
  */
@@ -17,17 +12,15 @@ import static com.example.user_service.util.Constants.NullEmptyConstants.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "medicine", indexes = @Index(name = "index_medId" , columnList = "med_id"))
+@Table(name = "medicine", indexes = @Index(name = "index_medicine_id" , columnList = "medicine_id"))
 public class Medicine {
 
     @Id
-    @Column(name = "med_id",nullable = false)
+    @Column(name = "medicine_id",nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
      private int medId;
 
-    @Column(name = "med_name",nullable = false,length = 70)
-    @NotNull(message = MED_NAME_NULL)
-    @NotEmpty(message = MED_NAME_EMPTY)
+    @Column(name = "medicine_name",nullable = false,length = 70)
     private String medName;
 
 }

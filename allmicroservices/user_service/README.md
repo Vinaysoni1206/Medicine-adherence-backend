@@ -21,7 +21,7 @@ user_service
 │     │   │         └───security
 │     │   │         └───service
 │     │   │         └───util
-│     │   │         └───EventFinderBackendApplication.java
+│     │   │         └───UserServiceApplication.java
 │     │   └───resources
 │     │       └─── application.properties
 └───...

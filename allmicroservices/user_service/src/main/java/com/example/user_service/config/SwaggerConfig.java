@@ -16,7 +16,6 @@ import java.util.Collections;
  * This is config class for swagger api contract
  */
 @Configuration
-
 public class SwaggerConfig {
 
     @Bean
