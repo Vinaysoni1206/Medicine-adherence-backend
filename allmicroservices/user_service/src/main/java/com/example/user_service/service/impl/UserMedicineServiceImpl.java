@@ -7,7 +7,7 @@ import com.example.user_service.model.MedicineHistory;
 import com.example.user_service.model.User;
 import com.example.user_service.model.UserMedicines;
 import com.example.user_service.pojos.request.MedicineHistoryDTO;
-import com.example.user_service.pojos.request.MedicinePojo;
+import com.example.user_service.pojos.request.MedicineDTO;
 import com.example.user_service.pojos.response.MedicineResponse;
 import com.example.user_service.repository.ImageRepository;
 import com.example.user_service.repository.UserMedHistoryRepository;
@@ -71,7 +71,7 @@ public class UserMedicineServiceImpl implements UserMedicineService {
 
 
     @Override
-    public String syncData(String userId, List<MedicinePojo> medicinePojo) throws UserMedicineException {
+    public String syncData(String userId, List<MedicineDTO> medicinePojo) throws UserMedicineException {
 
         logger.info(STARTING_METHOD_EXECUTION);
         logger.info("Syncing data for user with id : {}",userId);

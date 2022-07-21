@@ -49,8 +49,8 @@ public class UserDetails {
     @Range(min = 10)
     private Long userContact;
 
-    @Column(name = "lattitude")
-    private float lattitude;
+    @Column(name = "latitude")
+    private float latitude;
 
     @Column(name = "longitude")
     private float longitude;

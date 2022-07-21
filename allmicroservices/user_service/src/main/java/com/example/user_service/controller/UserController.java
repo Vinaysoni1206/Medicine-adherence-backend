@@ -11,7 +11,6 @@ import com.example.user_service.pojos.request.UserDetailEntityDTO;
 import com.example.user_service.pojos.request.UserDTO;
 import com.example.user_service.pojos.request.UserMedicineDTO;
 import com.example.user_service.service.UserService;
-import com.example.user_service.util.JwtUtil;
 import com.example.user_service.util.Constants;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -48,12 +47,12 @@ public class UserController {
     private final UserService userService;
 
     private final RabbitTemplate rabbitTemplate;
-    private final JwtUtil jwtUtil;
 
-    UserController(UserService userService,RabbitTemplate rabbitTemplate,JwtUtil jwtUtil){
+
+    UserController(UserService userService,RabbitTemplate rabbitTemplate){
         this.userService= userService;
         this.rabbitTemplate=rabbitTemplate;
-        this.jwtUtil=jwtUtil;
+
     }
 
     private final Logger logger= LoggerFactory.getLogger(UserController.class);

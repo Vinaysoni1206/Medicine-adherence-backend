@@ -13,7 +13,7 @@ import static com.example.user_service.util.Constants.NullEmptyConstants.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MedicinePojo {
+public class MedicineDTO {
 
     @EmptyNotNull(message = ID_EMPTY_NULL)
     private int userId;

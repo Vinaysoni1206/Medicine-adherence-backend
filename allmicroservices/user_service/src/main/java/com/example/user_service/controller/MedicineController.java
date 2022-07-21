@@ -4,7 +4,7 @@ package com.example.user_service.controller;
 import com.example.user_service.exception.UserMedicineException;
 import com.example.user_service.pojos.request.MedicineHistoryDTO;
 
-import com.example.user_service.pojos.request.MedicinePojo;
+import com.example.user_service.pojos.request.MedicineDTO;
 import com.example.user_service.pojos.response.ImageListResponse;
 import com.example.user_service.pojos.response.MedicineResponse;
 import com.example.user_service.pojos.response.SyncResponse;
@@ -53,7 +53,7 @@ public class MedicineController {
             @ApiResponse(code = 401, message = UNAUTHORIZED)})
     @Retryable(maxAttempts = 4)// retrying up to 4 times
     @PostMapping(value = "/medicines/sync", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SyncResponse> syncData(@NotNull @NotBlank  @RequestParam("userId") String userId,@Valid @RequestBody List<MedicinePojo> medicinePojo) throws UserMedicineException{
+    public ResponseEntity<SyncResponse> syncData(@NotNull @NotBlank  @RequestParam("userId") String userId,@Valid @RequestBody List<MedicineDTO> medicinePojo) throws UserMedicineException{
             String message = userMedicineService.syncData(userId,medicinePojo);
             return new ResponseEntity<>(new SyncResponse(message, "Synced Successfully"), HttpStatus.OK);
 
