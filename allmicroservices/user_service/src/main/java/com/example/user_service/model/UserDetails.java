@@ -42,8 +42,8 @@ public class UserDetails {
     @Column(name = "fcm_token",nullable = false)
     private String fcmToken;
 
-    @Column(name = "pincode")
-    private int pincode;
+    @Column(name = "pinCode")
+    private int pinCode;
 
     @Column(name = "user_contact",nullable = false)
     @Range(min = 10)
