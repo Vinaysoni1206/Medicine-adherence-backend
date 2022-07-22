@@ -24,6 +24,5 @@ public class SendImageDto {
     private String medicineName;
     @EmptyNotNull(message = ID_EMPTY_NULL)
     private String id;
-    @EmptyNotNull(message = ID_EMPTY_NULL)
     private Integer medicineId;
 }

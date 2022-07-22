@@ -6,11 +6,9 @@ import com.example.user_service.pojos.request.UserDetailEntityDTO;
 import com.example.user_service.pojos.request.UserDTO;
 import com.example.user_service.pojos.request.UserMailDTO;
 import com.example.user_service.pojos.request.UserMedicineDTO;
-import com.example.user_service.pojos.response.UserDetailResponsePage;
-import com.example.user_service.pojos.response.UserMailResponse;
-import com.example.user_service.pojos.response.UserProfileResponse;
-import com.example.user_service.pojos.response.UserResponse;
+import com.example.user_service.pojos.response.*;
 import com.example.user_service.service.UserService;
+import com.example.user_service.util.Constants;
 import com.example.user_service.util.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,11 +22,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,10 +50,7 @@ class UserControllerTest {
     @Mock
     UserService userService;
 
-    @Mock
-    RabbitTemplate rabbitTemplate;
-    @Mock
-    JwtUtil jwtUtil;
+
 
     @BeforeEach
     public void setUp(){
@@ -61,12 +58,11 @@ class UserControllerTest {
     }
     User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
     UserDTO userDTO = new UserDTO("vinay","vinay@gmail.com");
+    UserMailResponse userMailResponse= new UserMailResponse(Constants.SUCCESS, Constants.DATA_FOUND, user);
     UserResponse userResponse= new UserResponse();
-    UserDetailEntityDTO userDetailEntityDTO = new UserDetailEntityDTO("nikunj","vinay@gmail.com","something",21,null,"Male","AB+","UnMarried",60);
-    List<UserMedicineDTO> userMedicineDTOList= new ArrayList<>();
     UserDetailResponsePage userDetailResponsePage= new UserDetailResponsePage();
-
-
+    UserProfileResponse userProfileResponse= new UserProfileResponse();
+    RefreshTokenResponse response= new RefreshTokenResponse();
     @Test
     @ExtendWith(MockitoExtension.class)
     void saveUser() throws Exception {
@@ -79,16 +75,14 @@ class UserControllerTest {
                 .andExpect(status().isCreated());
     }
 
-//    @Test
-//    @ExtendWith(MockitoExtension.class)
-//    void refreshToken() throws Exception {
-//        Mockito.when(userService.getUserById(anyString())).thenReturn(user);
-//        Mockito.when(jwtUtil.generateToken(anyString())).thenReturn("jshfjdhfksj");
-//        mockMvc.perform(MockMvcRequestBuilders
-//                .get("/api/v1/refreshToken?userId=3549759519459734975")
-//                .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isCreated());
-//    }
+    @Test
+    @ExtendWith(MockitoExtension.class)
+    void refreshToken() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/v1/refreshToken?userId=3549759519459734975")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+    }
 
     @Test
     @ExtendWith(MockitoExtension.class)
@@ -113,8 +107,7 @@ class UserControllerTest {
     @Test
     @ExtendWith(MockitoExtension.class)
     void getUserById() throws Exception {
-        Mockito.when(userService.getUserById1(anyString())).thenReturn(userDetailEntityDTO);
-        Mockito.when(userService.getUserMedicineById(anyString())).thenReturn(userMedicineDTOList);
+        Mockito.when(userService.getUserByIdCustom(anyString())).thenReturn(userProfileResponse);
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/api/v1/user?userId=69216495194519259")
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -124,8 +117,7 @@ class UserControllerTest {
     @Test
     @ExtendWith(MockitoExtension.class)
     void getUserByEmail() throws Exception{
-        UserMailDTO userMailDTO= new UserMailDTO();
-        Mockito.when(userService.getUserByEmail1(anyString())).thenReturn(userMailDTO);
+        Mockito.when(userService.getUserByEmailCustom(anyString(),anyString())).thenReturn(userMailResponse);
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/api/v1/email?email=vinay@gmail.com&sender=vinay")
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -135,8 +127,7 @@ class UserControllerTest {
     @Test
     @ExtendWith(MockitoExtension.class)
     void getUserByEmailException() throws Exception{
-        UserMailDTO userMailDTO= new UserMailDTO();
-        Mockito.when(userService.getUserByEmail1(anyString())).thenReturn(null);
+        Mockito.when(userService.getUserByEmailCustom(anyString(),anyString())).thenReturn(null);
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/api/v1/email?email=vinay@gmail.com&sender=vinay")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -147,9 +138,9 @@ class UserControllerTest {
     @Test
     @ExtendWith(MockitoExtension.class)
     void sendPdf() throws Exception{
-        Mockito.when(userService.sendUserMedicines(123)).thenReturn("dydytkgjvhviyfoutyrxuljh");
+        Mockito.when(userService.sendUserMedicines(123)).thenReturn(userResponse);
         mockMvc.perform(MockMvcRequestBuilders
-                .get("/api/v1/pdf?medId=123")
+                .get("/api/v1/pdf?medicineId=123")
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
 

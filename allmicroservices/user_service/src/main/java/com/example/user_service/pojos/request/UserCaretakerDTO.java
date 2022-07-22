@@ -17,7 +17,6 @@ import static com.example.user_service.util.Constants.NullEmptyConstants.*;
 public class UserCaretakerDTO {
     @EmptyNotNull(message = PATIENT_NAME_EMPTY_NULL)
     private String patientName;
-    @EmptyNotNull
     private Boolean requestStatus;
     @EmptyNotNull(message = CARETAKER_ID_EMPTY_NULL)
     private String caretakerId;

@@ -18,9 +18,7 @@ import static com.example.user_service.util.Constants.NullEmptyConstants.*;
 public class UserDetailsDTO {
     @EmptyNotNull(message = BIO_EMPTY_NULL)
     private String bio;
-    @EmptyNotNull(message = AGE_EMPTY_NULL)
     private int age;
-    @EmptyNotNull(message = CONTACT_EMPTY_NULL)
     private Long userContact;
     @EmptyNotNull(message = GENDER_EMPTY_NULL)
     private String gender;
@@ -28,6 +26,5 @@ public class UserDetailsDTO {
     private String bloodGroup;
     @EmptyNotNull(message = MARITAL_STATUS_EMPTY_NULL)
     private String maritalStatus;
-    @EmptyNotNull(message = WEIGHT_EMPTY_NULL)
     private int weight;
 }

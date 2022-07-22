@@ -47,6 +47,12 @@ class JwtUtilTest {
     }
 
     @Test
+    void generateRefreshToken() {
+        String token = jwtUtil.generateRefreshToken("73578dfd-e7c9-4381-a348-113e72d80fa2");
+        String actualToken = token;
+        Assertions.assertEquals(actualToken, token);
+    }
+    @Test
     @ExtendWith(MockitoExtension.class)
     void validateToken() {
         MockHttpServletRequest request= new MockHttpServletRequest();

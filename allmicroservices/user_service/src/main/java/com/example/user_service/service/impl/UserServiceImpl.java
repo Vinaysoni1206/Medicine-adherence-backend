@@ -11,13 +11,12 @@ import com.example.user_service.model.UserMedicines;
 import com.example.user_service.pojos.request.UserDetailEntityDTO;
 import com.example.user_service.pojos.request.UserDTO;
 import com.example.user_service.pojos.request.UserMedicineDTO;
-import com.example.user_service.pojos.response.RefreshTokenResponse;
-import com.example.user_service.pojos.response.UserResponse;
-import com.example.user_service.pojos.response.UserDetailResponsePage;
+import com.example.user_service.pojos.response.*;
 import com.example.user_service.repository.UserDetailsRepository;
 import com.example.user_service.repository.UserMedicineRepository;
 import com.example.user_service.repository.UserRepository;
 import com.example.user_service.service.UserService;
+import com.example.user_service.util.Constants;
 import com.example.user_service.util.Datehelper;
 
 import com.example.user_service.util.JwtUtil;
@@ -27,9 +26,12 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +56,8 @@ public class UserServiceImpl implements UserService {
     private final PdfMailSender pdfMailSender;
     private final UserMedicineRepository userMedicineRepository;
     private final JwtUtil jwtUtil;
+    private final RabbitTemplate rabbitTemplate;
+
     Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
@@ -137,34 +141,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserByEmailCustom(String email) throws ResourceNotFoundException {
+    public UserMailResponse getUserByEmailCustom(String email, String sender) {
 
         logger.info(STARTING_METHOD_EXECUTION);
         logger.info("Searching for user by email : {}",email);
-        User userMailDTO=userRepository.findByMail(email);
-           if(userMailDTO.getUserName()==null) {
+        User user=userRepository.findByMail(email);
+           if(user.getUserName()==null) {
                logger.debug(USER_EMAIL_NOT_FOUND);
-               throw new ResourceNotFoundException(USER_EMAIL_NOT_FOUND);
+               logger.info("Sending mail if email is not present : {}",email);
+               rabbitTemplate.convertAndSend("project_exchange",
+                       "mail_key", new MailInfo(email, "Please join", "patient_request", sender));
+               return new UserMailResponse(Constants.DATA_NOT_FOUND,"Invitation sent to user with given email id!", null);
            }
-        logger.info(EXITING_METHOD_EXECUTION);
-        return userMailDTO;
+        return new UserMailResponse(Constants.SUCCESS, Constants.DATA_FOUND,user);
     }
 
     @Override
-    public User getUserByEmail(String email) throws UserExceptionMessage {
+    public User getUserByEmail(String email) {
         logger.info(STARTING_METHOD_EXECUTION);
         logger.info(EXITING_METHOD_EXECUTION);
-        User user= userRepository.findByMail(email);
-        if(user.getUserId()==null) {
-            throw new UserExceptionMessage(DATA_NOT_FOUND);
-        }else {
-            return user;
-        }
+        return userRepository.findByMail(email);
+
     }
 
 
     @Override
-    public String sendUserMedicines(Integer medicineId) throws FileNotFoundException, ResourceNotFoundException {
+    public UserResponse sendUserMedicines(Integer medicineId) throws FileNotFoundException, ResourceNotFoundException {
 
         logger.info(STARTING_METHOD_EXECUTION);
         logger.info("Fetching user medicines by medicine id : {}",medicineId);
@@ -175,9 +177,10 @@ public class UserServiceImpl implements UserService {
             }
             User entity = userMedicines.get().getUser();
             List<MedicineHistory> medicineHistories = userMedicines.get().getMedicineHistories();
-
         logger.info(EXITING_METHOD_EXECUTION);
-        return pdfMailSender.send(entity, userMedicines.get(), medicineHistories);
+        String filePath =pdfMailSender.send(entity, userMedicines.get(), medicineHistories);
+        return new UserResponse(Constants.SUCCESS, filePath, null, "", "");
+
     }
 
     @Override
@@ -194,14 +197,14 @@ public class UserServiceImpl implements UserService {
                 String jwtToken = jwtUtil.generateToken(user.getUserId());
                 String refreshToken = jwtUtil.generateRefreshToken(user.getUserId());
                 logger.info(EXITING_METHOD_EXECUTION);
-                return new UserResponse(SUCCESS, "Success", new ArrayList<>(Arrays.asList(user)), jwtToken, refreshToken);
+                return new UserResponse(SUCCESS, "Logged In", new ArrayList<>(Arrays.asList(user)), jwtToken, refreshToken);
             }
             logger.debug("User not found with this email :{}",mail);
             throw new ResourceNotFoundException(USER_NOT_FOUND);
     }
 
     @Override
-    public UserDetailEntityDTO getUserByIdCustom(String userId) throws UserExceptionMessage, ResourceNotFoundException {
+    public UserProfileResponse getUserByIdCustom(String userId) throws UserExceptionMessage, ResourceNotFoundException {
 
         logger.info(STARTING_METHOD_EXECUTION);
         logger.info("Fetching user me Id : {}",userId);
@@ -212,7 +215,9 @@ public class UserServiceImpl implements UserService {
                 throw new ResourceNotFoundException(USER_ID_NOT_FOUND);
             }
         logger.info(EXITING_METHOD_EXECUTION);
-        return optionalUserEntity.get();
+        List<UserMedicineDTO> list = getUserMedicineById(userId);
+        return   new UserProfileResponse(Constants.SUCCESS, Constants.DATA_FOUND, optionalUserEntity.get(), list);
+
     }
 
     @Override

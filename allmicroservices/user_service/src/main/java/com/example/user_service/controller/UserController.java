@@ -4,20 +4,15 @@ package com.example.user_service.controller;
 import com.example.user_service.exception.ResourceNotFoundException;
 import com.example.user_service.exception.UserExceptionMessage;
 import com.example.user_service.exception.UserMedicineException;
-import com.example.user_service.model.User;
 import com.example.user_service.pojos.response.*;
 import com.example.user_service.pojos.request.LoginDTO;
-import com.example.user_service.pojos.request.UserDetailEntityDTO;
 import com.example.user_service.pojos.request.UserDTO;
-import com.example.user_service.pojos.request.UserMedicineDTO;
 import com.example.user_service.service.UserService;
-import com.example.user_service.util.Constants;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +26,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static com.example.user_service.util.Constants.*;
@@ -46,13 +40,8 @@ import static com.example.user_service.util.Constants.*;
 public class UserController {
     private final UserService userService;
 
-    private final RabbitTemplate rabbitTemplate;
-
-
-    UserController(UserService userService,RabbitTemplate rabbitTemplate){
+    UserController(UserService userService){
         this.userService= userService;
-        this.rabbitTemplate=rabbitTemplate;
-
     }
 
     private final Logger logger= LoggerFactory.getLogger(UserController.class);
@@ -82,7 +71,7 @@ public class UserController {
     @Retryable(maxAttempts = 3)
     @PostMapping(value = "/refreshToken",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RefreshTokenResponse> getRefreshToken(HttpServletRequest httpServletRequest,@RequestParam(name = "userId") String userId) throws UserExceptionMessage, ResourceNotFoundException {
-        return new ResponseEntity<>(userService.getRefreshToken(httpServletRequest,userId),HttpStatus.OK);
+        return new ResponseEntity<>(userService.getRefreshToken(httpServletRequest,userId),HttpStatus.CREATED);
     }
 
     /**
@@ -134,15 +123,8 @@ public class UserController {
     public ResponseEntity<UserProfileResponse> getUserById(@NotBlank @NotNull @RequestParam("userId") String userId) throws UserExceptionMessage, UserMedicineException, ExecutionException, InterruptedException, ResourceNotFoundException {
 
         logger.info("Fetching user by Id : {}",userId);
-        UserDetailEntityDTO user = userService.getUserByIdCustom(userId);
-        List<UserMedicineDTO> list = userService.getUserMedicineById(userId);
-        UserProfileResponse userProfileResponse = new UserProfileResponse(Constants.SUCCESS, Constants.DATA_FOUND, user, list);
-        return new ResponseEntity<>(userProfileResponse, HttpStatus.OK);
-
-
+        return new ResponseEntity<>(userService.getUserByIdCustom(userId), HttpStatus.OK);
     }
-
-
     /**
      * Fetching the user with email if not present then sending invitation to that email address
      */
@@ -154,19 +136,9 @@ public class UserController {
     @Retryable(maxAttempts = 4)// retrying up to 4 times
     @GetMapping(value = "/email", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserMailResponse> getUserByEmail(@NotBlank @NotNull @RequestParam("email") String email
-            , @RequestParam("sender") String sender)
-            throws UserExceptionMessage, ResourceNotFoundException {
+            , @RequestParam("sender") String sender){
         logger.info("Fetching a user by mail : {}",email);
-        User userEntity = userService.getUserByEmailCustom(email);
-        if (userEntity == null) {
-            logger.info("Sending mail if email is not present : {}",email);
-            rabbitTemplate.convertAndSend("project_exchange",
-                    "mail_key", new MailInfo(email, "Please join", "patient_request", sender));
-            return new ResponseEntity<>(new UserMailResponse(Constants.DATA_NOT_FOUND,"Invitation sent to user with given email id!", null),HttpStatus.OK);
-
-        }
-        return new ResponseEntity<>(new UserMailResponse(Constants.SUCCESS, Constants.DATA_FOUND,userEntity),HttpStatus.OK);
-
+        return new ResponseEntity<>(userService.getUserByEmailCustom(email,sender),HttpStatus.OK);
     }
 
     /**
@@ -180,9 +152,7 @@ public class UserController {
     @GetMapping(value = "/pdf",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> sendPdf(@NotBlank @NotNull @RequestParam(name = "medicineId") Integer medicineId) throws IOException, MessagingException, UserExceptionMessage, ResourceNotFoundException {
         logger.info("Generating PDF file for a particular medicineId :{}",medicineId);
-        String filePath = userService.sendUserMedicines(medicineId);
-        UserResponse userResponse = new UserResponse(Constants.SUCCESS, filePath, null, "", "");
-        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+        return new ResponseEntity<>(userService.sendUserMedicines(medicineId), HttpStatus.OK);
 
     }
 

@@ -1,7 +1,7 @@
 package com.example.user_service.controller;
 
-import com.example.user_service.model.UserDetails;
 import com.example.user_service.pojos.request.UserDetailsDTO;
+import com.example.user_service.pojos.response.UserDetailResponse;
 import com.example.user_service.service.UserDetailService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,9 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import static org.springframework.http.ResponseEntity.status;
-
 
 @RunWith(SpringJUnit4ClassRunner.class)
 class UserDetailControllerTest {
@@ -39,14 +36,14 @@ class UserDetailControllerTest {
         this.mockMvc = MockMvcBuilders.standaloneSetup(userDetailController).build();
     }
 
-    UserDetails userDetails= new UserDetails();
+    UserDetailResponse userDetailResponse= new UserDetailResponse();
 
     @Test
     @ExtendWith(MockitoExtension.class)
-    void updateuserDetails() throws Exception{
-        UserDetailsDTO userDetailsDTO= new UserDetailsDTO();
+    void updateUserDetails() throws Exception{
+        UserDetailsDTO userDetailsDTO= new UserDetailsDTO("something",21,3414L,"Male","AB+","Unmarried",60);
         String jsonTest = objectMapper.writeValueAsString(userDetailsDTO);
-        Mockito.when(userDetailService.saveUserDetail("534851457147",userDetailsDTO)).thenReturn(userDetails);
+        Mockito.when(userDetailService.saveUserDetail("534851457147",userDetailsDTO)).thenReturn(userDetailResponse);
         mockMvc.perform(MockMvcRequestBuilders
                 .put("/api/v1/user-details?userId=534851457147")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

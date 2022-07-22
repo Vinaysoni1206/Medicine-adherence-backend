@@ -50,9 +50,7 @@ public class UserDetailController {
     @PutMapping(value = "/user-details" , produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDetailResponse> updateUserDetails(@NotNull @NotBlank @RequestParam("userId") String userId,
                                                                 @Valid @RequestBody UserDetailsDTO userDetailsDTO) throws UserExceptionMessage, ResourceNotFoundException {
-        UserDetails userDetails = userDetailService.saveUserDetail(userId,userDetailsDTO);
-        UserDetailResponse userDetailResponse= new UserDetailResponse("Success","Saved user details",userDetails);
-        return new ResponseEntity<>(userDetailResponse,HttpStatus.OK);
+        return new ResponseEntity<>(userDetailService.saveUserDetail(userId,userDetailsDTO),HttpStatus.OK);
 
     }
 

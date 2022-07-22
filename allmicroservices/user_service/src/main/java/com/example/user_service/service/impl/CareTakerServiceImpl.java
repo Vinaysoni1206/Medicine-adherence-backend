@@ -3,14 +3,11 @@ package com.example.user_service.service.impl;
 
 import com.example.user_service.exception.ResourceNotFoundException;
 import com.example.user_service.exception.UserCaretakerException;
-import com.example.user_service.exception.UserExceptionMessage;
 import com.example.user_service.model.Image;
 import com.example.user_service.model.UserCaretaker;
 import com.example.user_service.model.UserMedicines;
-import com.example.user_service.pojos.response.NotificationMessage;
+import com.example.user_service.pojos.response.*;
 import com.example.user_service.pojos.request.UserCaretakerDTO;
-import com.example.user_service.pojos.response.ImageResponse;
-import com.example.user_service.pojos.response.CaretakerResponsePage;
 import com.example.user_service.repository.ImageRepository;
 import com.example.user_service.repository.UserCaretakerRepository;
 import com.example.user_service.repository.UserMedicineRepository;
@@ -63,7 +60,7 @@ public class CareTakerServiceImpl implements CareTakerService {
         this.mapper= modelMapper;
     }
     @Override
-    public UserCaretaker saveCareTaker(UserCaretakerDTO userCaretakerDTO) throws UserCaretakerException {
+    public CaretakerResponse saveCareTaker(UserCaretakerDTO userCaretakerDTO) throws UserCaretakerException {
 
         logger.info(STARTING_METHOD_EXECUTION);
         logger.info("Saving a caretaker with details: {}", userCaretakerDTO);
@@ -76,23 +73,25 @@ public class CareTakerServiceImpl implements CareTakerService {
                 logger.info(RESPONSE_SAVED);
                 userCaretakerRepository.save(userCaretaker);
                 logger.info(EXITING_METHOD_EXECUTION);
-                return userCaretaker;
+                return new CaretakerResponse(SUCCESS, "Request sent successfully", userCaretaker);
+
             }
     }
 
     @Override
-    public UserCaretaker updateCaretakerStatus(String caretakerId) throws UserCaretakerException {
+    public CaretakerResponse updateCaretakerStatus(String caretakerId) throws UserCaretakerException {
         logger.info(STARTING_METHOD_EXECUTION);
-            UserCaretaker uc = userCaretakerRepository.getById(caretakerId);
-            if (uc.getCaretakerId()==null) {
+            Optional<UserCaretaker> userCaretaker = userCaretakerRepository.findById(caretakerId);
+            if (userCaretaker.isPresent()) {
+                userCaretaker.get().setRequestStatus(true);
+                userCaretakerRepository.save(userCaretaker.get());
                 logger.info("Caretaker not found with cId : {}",caretakerId);
+            }else {
                 throw new UserCaretakerException(NO_RECORD_FOUND);
             }
-            uc.setRequestStatus(true);
         logger.info(RESPONSE_SAVED);
-        userCaretakerRepository.save(uc);
         logger.info(EXITING_METHOD_EXECUTION);
-        return uc;
+        return new CaretakerResponse(SUCCESS, "Status updated", userCaretaker.get());
     }
 
     @Override
@@ -111,7 +110,7 @@ public class CareTakerServiceImpl implements CareTakerService {
     }
 
     @Override
-    public List<UserCaretaker> getPatientRequests(String userId) throws UserCaretakerException, ResourceNotFoundException {
+    public CaretakerListResponse getPatientRequests(String userId) throws UserCaretakerException, ResourceNotFoundException {
         logger.info(STARTING_METHOD_EXECUTION);
         logger.info("Fetching list of patient requests send to a caretaker with id : {}",userId);
             List<UserCaretaker> userCaretaker =userCaretakerRepository.getPatientRequests(userId);
@@ -120,11 +119,11 @@ public class CareTakerServiceImpl implements CareTakerService {
                 throw new ResourceNotFoundException(PATIENT_REQUEST_NOT_FOUND);
             }
         logger.info(EXITING_METHOD_EXECUTION);
-        return userCaretaker;
+        return new CaretakerListResponse(SUCCESS, DATA_FOUND, userCaretaker);
     }
 
     @Override
-    public List<UserCaretaker> getMyCaretakers(String userId) throws UserCaretakerException, ResourceNotFoundException {
+    public CaretakerListResponse getMyCaretakers(String userId) throws UserCaretakerException, ResourceNotFoundException {
         logger.info(STARTING_METHOD_EXECUTION);
         logger.info("Fetching list of caretakers for id : {}", userId);
             List<UserCaretaker> userCaretaker = userCaretakerRepository.getMyCaretakers(userId);
@@ -133,7 +132,7 @@ public class CareTakerServiceImpl implements CareTakerService {
                 throw new ResourceNotFoundException(CARETAKERS_NOT_FOUND);
             }
         logger.info(EXITING_METHOD_EXECUTION);
-        return userCaretaker;
+        return new CaretakerListResponse(SUCCESS, DATA_FOUND, userCaretaker);
     }
 
     @Override
@@ -152,7 +151,7 @@ public class CareTakerServiceImpl implements CareTakerService {
 
 
     @Override
-    public List<UserCaretaker> getCaretakerRequests(String userId) throws UserCaretakerException {
+    public CaretakerListResponse getCaretakerRequests(String userId) throws UserCaretakerException {
 
         logger.info(STARTING_METHOD_EXECUTION);
         logger.info("Fetching caretaker request send to a patient for id : {}", userId);
@@ -161,11 +160,11 @@ public class CareTakerServiceImpl implements CareTakerService {
                 throw new UserCaretakerException(REQUEST_NOT_FOUND);
             }
         logger.info(EXITING_METHOD_EXECUTION);
-        return userCaretaker;
+        return new CaretakerListResponse(SUCCESS, DATA_FOUND, userCaretaker);
     }
 
     @Override
-    public String deletePatientRequest(String caretakerId) throws UserCaretakerException {
+    public CaretakerDelete deletePatientRequest(String caretakerId) throws UserCaretakerException {
 
         logger.info(STARTING_METHOD_EXECUTION);
         logger.info("Deleting patient request for a caretaker with id : {}",caretakerId);
@@ -174,7 +173,7 @@ public class CareTakerServiceImpl implements CareTakerService {
                 userCaretaker.get().setDelete(true);
                 userCaretakerRepository.save(userCaretaker.get());
                 logger.info(EXITING_METHOD_EXECUTION);
-                return SUCCESS;
+                return new CaretakerDelete(SUCCESS, "Deleted successfully");
             }
             logger.debug("Request not found for id : {}",caretakerId);
             throw new UserCaretakerException(REQUEST_NOT_FOUND);

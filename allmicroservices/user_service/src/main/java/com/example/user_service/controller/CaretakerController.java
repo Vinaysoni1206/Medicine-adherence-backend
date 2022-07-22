@@ -4,7 +4,6 @@ import com.example.user_service.exception.ResourceNotFoundException;
 import com.example.user_service.exception.UserCaretakerException;
 
 import com.example.user_service.exception.UserExceptionMessage;
-import com.example.user_service.model.UserCaretaker;
 import com.example.user_service.pojos.response.NotificationMessage;
 import com.example.user_service.pojos.request.SendImageDto;
 import com.example.user_service.pojos.request.UserCaretakerDTO;
@@ -34,7 +33,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.List;
 
 import static com.example.user_service.util.Constants.*;
 
@@ -74,9 +72,7 @@ public class CaretakerController {
     @Transactional(timeout = 12)
     @Retryable(maxAttempts = 4)// retrying up to 4 times
     public ResponseEntity<CaretakerResponse> saveCaretaker(@Valid @RequestBody UserCaretakerDTO userCaretakerDTO) throws UserCaretakerException {
-        UserCaretaker userCaretaker = careTakerService.saveCareTaker(userCaretakerDTO);
-        CaretakerResponse caretakerResponse = new CaretakerResponse(SUCCESS, "Request sent successfully", userCaretaker);
-        return new ResponseEntity<>(caretakerResponse, HttpStatus.CREATED);
+        return new ResponseEntity<>(careTakerService.saveCareTaker(userCaretakerDTO), HttpStatus.CREATED);
 
     }
 
@@ -92,9 +88,7 @@ public class CaretakerController {
     @PutMapping(value = "/accept",produces = MediaType.APPLICATION_JSON_VALUE, consumes = "application/json")
      public ResponseEntity<CaretakerResponse> updateCaretakerStatus(@NotNull @NotBlank @RequestParam(name = "caretakerId") String caretakerId)
             throws UserCaretakerException {
-        UserCaretaker userCaretaker = careTakerService.updateCaretakerStatus(caretakerId);
-        CaretakerResponse caretakerResponse = new CaretakerResponse(SUCCESS, "Status updated", userCaretaker);
-        return new ResponseEntity<>(caretakerResponse, HttpStatus.OK);
+        return new ResponseEntity<>(careTakerService.updateCaretakerStatus(caretakerId), HttpStatus.OK);
 
     }
 
@@ -112,7 +106,6 @@ public class CaretakerController {
     public ResponseEntity<CaretakerResponsePage> getPatientsUnderMe(@NotNull @NotBlank @RequestParam(name = "caretakerId") String caretakerId,
                                                                     @RequestParam(defaultValue = "0") int pageNo,
                                                                     @RequestParam(defaultValue = "3") int pageSize) throws UserCaretakerException, ResourceNotFoundException {
-
         return new ResponseEntity<>(careTakerService.getPatientsUnderMe(caretakerId, pageNo,pageSize), HttpStatus.OK);
     }
 
@@ -127,9 +120,7 @@ public class CaretakerController {
     @Retryable(maxAttempts = 4)// retrying up to 4 times
     @GetMapping(value = "/patient/requests",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CaretakerListResponse> getPatientRequests(@NotNull @NotBlank @RequestParam(name = "caretakerId") String caretakerId) throws UserCaretakerException, ResourceNotFoundException {
-        List<UserCaretaker> userCaretakerList = careTakerService.getPatientRequests(caretakerId);
-        CaretakerListResponse caretakerResponseList = new CaretakerListResponse(SUCCESS, DATA_FOUND, userCaretakerList);
-        return new ResponseEntity<>(caretakerResponseList, HttpStatus.OK);
+       return new ResponseEntity<>(careTakerService.getPatientRequests(caretakerId), HttpStatus.OK);
 
     }
 
@@ -144,9 +135,7 @@ public class CaretakerController {
     @Retryable(maxAttempts = 4)// retrying up to 4 times
     @GetMapping(value = "/caretakers",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CaretakerListResponse> getMyCaretakers(@NotNull @NotBlank @RequestParam(name = "patientId") String patientId) throws UserCaretakerException, ResourceNotFoundException {
-        List<UserCaretaker> userCaretakerList = careTakerService.getMyCaretakers(patientId);
-        CaretakerListResponse caretakerResponseList = new CaretakerListResponse(SUCCESS, DATA_FOUND, userCaretakerList);
-        return new ResponseEntity<>(caretakerResponseList, HttpStatus.OK);
+        return new ResponseEntity<>(careTakerService.getMyCaretakers(patientId), HttpStatus.OK);
     }
 
     /**
@@ -160,9 +149,7 @@ public class CaretakerController {
     @Retryable(maxAttempts = 4)// retrying up to 4 times
     @GetMapping(value = "/caretaker/requests",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CaretakerListResponse> getCaretakerRequests(@NotNull @NotBlank @RequestParam(name = "patientId") String patientId) throws UserCaretakerException {
-        List<UserCaretaker> userCaretakerList = careTakerService.getCaretakerRequests(patientId);
-        CaretakerListResponse caretakerResponseList = new CaretakerListResponse(SUCCESS, DATA_FOUND, userCaretakerList);
-        return new ResponseEntity<>(caretakerResponseList, HttpStatus.OK);
+        return new ResponseEntity<>(careTakerService.getCaretakerRequests(patientId), HttpStatus.OK);
 
     }
 
@@ -176,9 +163,7 @@ public class CaretakerController {
             @ApiResponse(code = 401, message = UNAUTHORIZED)})
     @GetMapping(value = "/delete",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CaretakerDelete> delPatientReq(@NotNull @NotBlank @RequestParam(name = "caretakerId") String caretakerId) throws UserExceptionMessage, UserCaretakerException {
-        String delPatientStatus = careTakerService.deletePatientRequest(caretakerId);
-        CaretakerDelete caretakerDelete = new CaretakerDelete(delPatientStatus, "Deleted successfully");
-        return new ResponseEntity<>(caretakerDelete, HttpStatus.OK);
+        return new ResponseEntity<>(careTakerService.deletePatientRequest(caretakerId), HttpStatus.OK);
     }
 
 
@@ -205,7 +190,7 @@ public class CaretakerController {
      */
     @ApiOperation(value = "Sends image to caretaker for strict adherence")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = SUCCESS),
+            @ApiResponse(code = 201, message = SUCCESS),
             @ApiResponse(code = 500,message = NO_RECORD_FOUND),
             @ApiResponse(code = 401, message = UNAUTHORIZED)})
     @PostMapping(value = "/image",produces = MediaType.APPLICATION_JSON_VALUE)
@@ -214,8 +199,7 @@ public class CaretakerController {
     public ResponseEntity<ImageResponse> sendImageToCaretaker(@Valid @ModelAttribute("sendImageDto") SendImageDto sendImageDto) throws IOException, UserCaretakerException {
 
         logger.info("sending image");
-        ImageResponse imageResponse= careTakerService.sendImageToCaretaker(sendImageDto.getImage(),sendImageDto.getName(),sendImageDto.getMedicineName(),sendImageDto.getId(),sendImageDto.getMedicineId());
-        return new ResponseEntity<>(imageResponse,HttpStatus.CREATED);
+        return new ResponseEntity<>(careTakerService.sendImageToCaretaker(sendImageDto.getImage(),sendImageDto.getName(),sendImageDto.getMedicineName(),sendImageDto.getId(),sendImageDto.getMedicineId()),HttpStatus.CREATED);
     }
 
 

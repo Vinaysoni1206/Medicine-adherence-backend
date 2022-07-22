@@ -6,14 +6,14 @@ import com.example.user_service.model.Image;
 import com.example.user_service.model.MedicineHistory;
 import com.example.user_service.model.UserMedicines;
 import com.example.user_service.model.User;
+import com.example.user_service.pojos.request.MedicineDTO;
 import com.example.user_service.pojos.request.MedicineHistoryDTO;
-import com.example.user_service.pojos.request.MedicinePojo;
 import com.example.user_service.pojos.response.MedicineResponse;
 import com.example.user_service.repository.ImageRepository;
 import com.example.user_service.repository.UserMedHistoryRepository;
 import com.example.user_service.repository.UserMedicineRepository;
 import com.example.user_service.repository.UserRepository;
-import com.example.user_service.service.UserMedicineServiceImpl;
+import com.example.user_service.service.impl.UserMedicineServiceImpl;
 import com.example.user_service.util.Constants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +29,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+
+import static com.example.user_service.util.Constants.MEDICINES_NOT_FOUND;
+import static com.example.user_service.util.Constants.USER_NOT_FOUND;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -59,13 +62,13 @@ class UserMedicineServiceTest {
         when(userRepository.getUserById("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(null);
         try{
             userMedicineServiceImpl.getAllUserMedicines("73578dfd-e7c9-4381-a348-113e72d80fa2");
-        }catch (UserExceptionMessage | UserMedicineException userExceptionMessage){
-            Assertions.assertEquals("Data not found",userExceptionMessage.getMessage());
+        }catch (UserExceptionMessage userExceptionMessage){
+            Assertions.assertEquals(USER_NOT_FOUND,userExceptionMessage.getMessage());
         }
     }
 
     @Test
-    void getAllUserMedicinesTest() throws UserExceptionMessage, UserMedicineException, ExecutionException, InterruptedException {
+    void getAllUserMedicinesTest() throws UserExceptionMessage, ExecutionException, InterruptedException {
         UserMedicines userMedicines= new UserMedicines();
         List<UserMedicines> userMedicines1= new ArrayList<>();
         userMedicines1.add(userMedicines);
@@ -76,8 +79,8 @@ class UserMedicineServiceTest {
     }
 
     @Test
-    void synDataException() throws UserMedicineException {
-        List<MedicinePojo> medicinePojoList = new ArrayList<>();
+    void synDataException() {
+        List<MedicineDTO> medicinePojoList = new ArrayList<>();
         List<UserMedicines> userMedicines1= new ArrayList<>();
         User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,userMedicines1);
         when(userRepository.getUserById("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(user);
@@ -90,8 +93,8 @@ class UserMedicineServiceTest {
 
     @Test
     void syncDataTest() throws UserMedicineException {
-        MedicinePojo medicinePojo= new MedicinePojo(123,"Mon",1,null,"something",10,"PCM","something",null,0,"10:00 AM");
-        List<MedicinePojo> medicinePojoList = new ArrayList<>();
+        MedicineDTO medicinePojo= new MedicineDTO(123,"Mon",1,null,"something",10,"PCM","something",null,0,"10:00 AM");
+        List<MedicineDTO> medicinePojoList = new ArrayList<>();
         medicinePojoList.add(medicinePojo);
         List<MedicineHistory> medicineHistoryList = new ArrayList<>();
         List<UserMedicines> userMedicinesList= new ArrayList<>();
@@ -148,7 +151,7 @@ class UserMedicineServiceTest {
         try{
             userMedicineServiceImpl.getMedicineHistory(123);
         }catch (UserMedicineException e){
-            Assertions.assertEquals("No record found",e.getMessage());
+            Assertions.assertEquals(MEDICINES_NOT_FOUND,e.getMessage());
         }
     }
 

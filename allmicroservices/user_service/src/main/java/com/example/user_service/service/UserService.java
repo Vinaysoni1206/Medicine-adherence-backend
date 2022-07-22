@@ -4,12 +4,9 @@ import com.example.user_service.exception.ResourceNotFoundException;
 import com.example.user_service.exception.UserExceptionMessage;
 import com.example.user_service.exception.UserMedicineException;
 import com.example.user_service.model.User;
-import com.example.user_service.pojos.request.UserDetailEntityDTO;
 import com.example.user_service.pojos.request.UserDTO;
 import com.example.user_service.pojos.request.UserMedicineDTO;
-import com.example.user_service.pojos.response.RefreshTokenResponse;
-import com.example.user_service.pojos.response.UserResponse;
-import com.example.user_service.pojos.response.UserDetailResponsePage;
+import com.example.user_service.pojos.response.*;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -31,17 +28,19 @@ public interface UserService {
 
      List<User> getUserByName(String userName) throws UserExceptionMessage, ResourceNotFoundException;
 
-     User getUserByEmailCustom(String email) throws UserExceptionMessage, ResourceNotFoundException;
+     UserMailResponse getUserByEmailCustom(String email, String sender) ;
 
      User getUserByEmail(String email) throws UserExceptionMessage;
 
-     String sendUserMedicines(Integer userId) throws MessagingException, IOException, UserExceptionMessage, ResourceNotFoundException;
+     UserResponse sendUserMedicines(Integer userId) throws MessagingException, IOException, UserExceptionMessage, ResourceNotFoundException;
 
      UserResponse login(String mail , String fcmToken) throws UserExceptionMessage, ResourceNotFoundException;
 
-     UserDetailEntityDTO getUserByIdCustom(String userId) throws UserExceptionMessage, UserMedicineException, ExecutionException, InterruptedException, ResourceNotFoundException;
+     UserProfileResponse getUserByIdCustom(String userId) throws UserExceptionMessage, UserMedicineException, ExecutionException, InterruptedException, ResourceNotFoundException;
 
      List<UserMedicineDTO> getUserMedicineById(String userId) throws UserExceptionMessage, UserMedicineException, ExecutionException, InterruptedException;
 
      RefreshTokenResponse getRefreshToken(HttpServletRequest token,String userId) throws UserExceptionMessage, ResourceNotFoundException;
+
+     Boolean checkRefreshToken(String jwt);
 }

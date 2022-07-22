@@ -42,7 +42,7 @@ public class UserDetails {
     @Column(name = "fcm_token",nullable = false)
     private String fcmToken;
 
-    @Column(name = "pinCode")
+    @Column(name = "pin_code")
     private int pinCode;
 
     @Column(name = "user_contact",nullable = false)

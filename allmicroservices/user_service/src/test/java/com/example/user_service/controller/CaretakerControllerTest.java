@@ -1,10 +1,11 @@
 package com.example.user_service.controller;
 
-import com.example.user_service.model.UserCaretaker;
 import com.example.user_service.pojos.request.SendImageDto;
 import com.example.user_service.pojos.request.UserCaretakerDTO;
+import com.example.user_service.pojos.response.CaretakerDelete;
+import com.example.user_service.pojos.response.CaretakerListResponse;
+import com.example.user_service.pojos.response.CaretakerResponse;
 import com.example.user_service.service.CareTakerService;
-import com.example.user_service.util.Constants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,9 +24,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -50,15 +48,16 @@ class CaretakerControllerTest {
     }
 
     UserCaretakerDTO userCaretakerDTO= new UserCaretakerDTO("vinay",false,"73578dfd-e7c9-4381-a348-113e72d80fa2","548259761235609","nikunj","duyvoayvf","p");
-    UserCaretaker userCaretaker= new UserCaretaker();
-    List<UserCaretaker> userCaretakerList= new ArrayList<>();
+    CaretakerResponse caretakerResponse= new CaretakerResponse();
+    CaretakerListResponse caretakerListResponse= new CaretakerListResponse();
 
+    CaretakerDelete caretakerDelete= new CaretakerDelete();
 
     @Test
     @ExtendWith(MockitoExtension.class)
     @DisplayName("Test for saving a caretaker - POST")
     void saveCaretaker() throws  Exception{
-        Mockito.when(careTakerService.saveCareTaker(userCaretakerDTO)).thenReturn(userCaretaker);
+        Mockito.when(careTakerService.saveCareTaker(userCaretakerDTO)).thenReturn(caretakerResponse);
         String jsonText = objectMapper.writeValueAsString(userCaretakerDTO);
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/v1/request")
@@ -71,7 +70,7 @@ class CaretakerControllerTest {
     @ExtendWith(MockitoExtension.class)
     @DisplayName("Test for Updating Caretaker Status - PUT")
     void updateCaretakerStatus() throws Exception{
-        Mockito.when(careTakerService.updateCaretakerStatus("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(userCaretaker);
+        Mockito.when(careTakerService.updateCaretakerStatus("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(caretakerResponse);
         mockMvc.perform(MockMvcRequestBuilders
                 .put("/api/v1/accept?caretakerId=73578dfd-e7c9-4381-a348-113e72d80fa2")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -93,7 +92,7 @@ class CaretakerControllerTest {
     @ExtendWith(MockitoExtension.class)
     @DisplayName("Test for getting list of patient request for a caretaker - GET")
     void getPatientRequestsC() throws Exception{
-        Mockito.when(careTakerService.getPatientRequests("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(userCaretakerList);
+        Mockito.when(careTakerService.getPatientRequests("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(caretakerListResponse);
         mockMvc.perform(MockMvcRequestBuilders
                 .get("/api/v1/patient/requests?caretakerId=73578dfd-e7c9-4381-a348-113e72d80fa2")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -104,7 +103,7 @@ class CaretakerControllerTest {
     @ExtendWith(MockitoExtension.class)
     @DisplayName("Test for fetching list of caretakers for a patient - GET")
     void getMyCaretakers() throws Exception {
-        Mockito.when(careTakerService.getMyCaretakers("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(userCaretakerList);
+        Mockito.when(careTakerService.getMyCaretakers("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(caretakerListResponse);
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/api/v1/caretakers?patientId=73578dfd-e7c9-4381-a348-113e72d80fa2")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -115,7 +114,7 @@ class CaretakerControllerTest {
     @ExtendWith(MockitoExtension.class)
     @DisplayName("Test for fetching list of caretaker request for a patient - GET")
     void getCaretakerRequestsP() throws Exception{
-        Mockito.when(careTakerService.getCaretakerRequests("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(userCaretakerList);
+        Mockito.when(careTakerService.getCaretakerRequests("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(caretakerListResponse);
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/api/v1/caretaker/requests?patientId=73578dfd-e7c9-4381-a348-113e72d80fa2")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -126,7 +125,7 @@ class CaretakerControllerTest {
     @ExtendWith(MockitoExtension.class)
     @DisplayName("Test for deleting a patient request - GET")
     void delPatientReq() throws Exception{
-        Mockito.when(careTakerService.delPatientReq("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(Constants.SUCCESS);
+        Mockito.when(careTakerService.deletePatientRequest("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(caretakerDelete);
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/api/v1/delete?caretakerId=73578dfd-e7c9-4381-a348-113e72d80fa2")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -138,7 +137,7 @@ class CaretakerControllerTest {
     @DisplayName("Test to notify a user - GET")
     void notifyUserForMed() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/api/v1/notify/user?fcmToken=egufagfljbgalgfoeiugi&medName=PCM")
+                        .get("/api/v1/notify/user?fcmToken=egufagfljbgalgfoeiugi&medicineName=PCM")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
@@ -154,9 +153,9 @@ class CaretakerControllerTest {
                         .multipart("/api/v1/image")
                         .file("image",sendImageDto.getImage().getBytes())
                         .param("name",sendImageDto.getName())
-                        .param("medName",sendImageDto.getMedName())
+                        .param("medicineName",sendImageDto.getMedicineName())
                         .param("id",sendImageDto.getId())
-                        .param("medId",sendImageDto.getMedId().toString())
+                        .param("medicineId",sendImageDto.getMedicineId().toString())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
     }

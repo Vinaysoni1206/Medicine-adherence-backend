@@ -1,10 +1,10 @@
 package com.example.user_service.service.impl;
 
 import com.example.user_service.exception.ResourceNotFoundException;
-import com.example.user_service.exception.UserExceptionMessage;
 import com.example.user_service.model.UserDetails;
 import com.example.user_service.model.User;
 import com.example.user_service.pojos.request.UserDetailsDTO;
+import com.example.user_service.pojos.response.UserDetailResponse;
 import com.example.user_service.repository.UserDetailsRepository;
 import com.example.user_service.repository.UserRepository;
 import com.example.user_service.service.UserDetailService;
@@ -34,7 +34,7 @@ public class UserDetailServiceImpl implements UserDetailService {
         this.userRepository= userRepository;
     }
     @Override
-    public UserDetails saveUserDetail(String id, UserDetailsDTO userDetailsDTO) throws UserExceptionMessage, ResourceNotFoundException {
+    public UserDetailResponse saveUserDetail(String id, UserDetailsDTO userDetailsDTO) throws ResourceNotFoundException {
         logger.info(STARTING_METHOD_EXECUTION);
         logger.info("Saving user details for user id : {}",id);
             Optional<User> user = Optional.ofNullable(userRepository.getUserById(id));
@@ -42,19 +42,19 @@ public class UserDetailServiceImpl implements UserDetailService {
                 logger.debug("User not found for id : {}",id);
                 throw new ResourceNotFoundException(USER_NOT_FOUND);
             }
-            UserDetails userDetails1 = user.get().getUserDetails();
+            UserDetails userDetails = user.get().getUserDetails();
 
-            userDetails1.setAge(userDetailsDTO.getAge());
-            userDetails1.setBloodGroup(userDetailsDTO.getBloodGroup());
-            userDetails1.setBio(userDetailsDTO.getBio());
-            userDetails1.setGender(userDetailsDTO.getGender());
-            userDetails1.setWeight(userDetailsDTO.getWeight());
-            userDetails1.setMaritalStatus(userDetailsDTO.getMaritalStatus());
-            userDetails1.setUserContact(userDetailsDTO.getUserContact());
+            userDetails.setAge(userDetailsDTO.getAge());
+            userDetails.setBloodGroup(userDetailsDTO.getBloodGroup());
+            userDetails.setBio(userDetailsDTO.getBio());
+            userDetails.setGender(userDetailsDTO.getGender());
+            userDetails.setWeight(userDetailsDTO.getWeight());
+            userDetails.setMaritalStatus(userDetailsDTO.getMaritalStatus());
+            userDetails.setUserContact(userDetailsDTO.getUserContact());
             logger.info(RESPONSE_SAVED);
-            userDetailsRepository.save(userDetails1);
+            userDetailsRepository.save(userDetails);
             logger.info(EXITING_METHOD_EXECUTION);
-            return userDetails1;
+            return  new UserDetailResponse(SUCCESS,"Saved user details",userDetails);
         }
 
     }

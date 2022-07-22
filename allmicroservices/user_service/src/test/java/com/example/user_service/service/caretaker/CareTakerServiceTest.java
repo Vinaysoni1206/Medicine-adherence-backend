@@ -1,5 +1,6 @@
 package com.example.user_service.service.caretaker;
 
+import com.example.user_service.exception.ResourceNotFoundException;
 import com.example.user_service.exception.UserCaretakerException;
 import com.example.user_service.exception.UserExceptionMessage;
 import com.example.user_service.model.MedicineHistory;
@@ -8,12 +9,11 @@ import com.example.user_service.model.UserCaretaker;
 import com.example.user_service.model.User;
 import com.example.user_service.pojos.request.SendImageDto;
 import com.example.user_service.pojos.request.UserCaretakerDTO;
-import com.example.user_service.pojos.response.ImageResponse;
-import com.example.user_service.pojos.response.CaretakerResponsePage;
+import com.example.user_service.pojos.response.*;
 import com.example.user_service.repository.ImageRepository;
 import com.example.user_service.repository.UserCaretakerRepository;
 import com.example.user_service.repository.UserMedicineRepository;
-import com.example.user_service.service.CareTakerServiceImpl;
+import com.example.user_service.service.impl.CareTakerServiceImpl;
 import com.example.user_service.util.Constants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -82,18 +82,17 @@ class CareTakerServiceTest {
         UserCaretaker userCaretaker= new UserCaretaker();
         when(mapper.map(userCaretakerDTO,UserCaretaker.class)).thenReturn(userCaretaker);
         when(userCaretakerRepository.check(userCaretaker.getPatientId(),userCaretaker.getCaretakerId())).thenReturn(null);
-        UserCaretaker userCaretakerReal= careTakerServiceImpl.saveCareTaker(userCaretakerDTO);
-        Assertions.assertEquals(userCaretaker.getPatientName(),userCaretakerReal.getPatientName());
-        Assertions.assertEquals(userCaretaker.getCaretakerId(),userCaretakerReal.getCaretakerId());
-        Assertions.assertEquals(userCaretaker.getPatientId(),userCaretakerReal.getPatientId());
+        CaretakerResponse caretakerResponseReal= careTakerServiceImpl.saveCareTaker(userCaretakerDTO);
+        Assertions.assertEquals(userCaretaker.getPatientName(),caretakerResponseReal.getUserCaretaker().getPatientName());
+        Assertions.assertEquals(userCaretaker.getCaretakerId(),caretakerResponseReal.getUserCaretaker().getCaretakerId());
+        Assertions.assertEquals(userCaretaker.getPatientId(),caretakerResponseReal.getUserCaretaker().getPatientId());
     }
 
     @Test
     void updateCaretakerStatusException(){
         UserCaretaker userCaretaker= new UserCaretaker();
-        when(userCaretakerRepository.getById(userCaretaker.getCId())).thenReturn(userCaretaker);
         try{
-            careTakerServiceImpl.updateCaretakerStatus(userCaretaker.getCId());
+            careTakerServiceImpl.updateCaretakerStatus(userCaretaker.getCaretakerId());
         }catch (UserCaretakerException userCaretakerException){
             Assertions.assertEquals(Constants.NO_RECORD_FOUND,userCaretakerException.getMessage());
         }
@@ -102,11 +101,12 @@ class CareTakerServiceTest {
     @Test
     void updateCaretakerStatusTest() throws UserCaretakerException {
         UserCaretaker userCaretaker= new UserCaretaker("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay",true,"ftdutsaduifioadf","yfuydfafakjfdafdou","nikunj",LocalDateTime.now(),"p",false);
-        when(userCaretakerRepository.getById(userCaretaker.getCId())).thenReturn(userCaretaker);
-        UserCaretaker userCaretakerReal= careTakerServiceImpl.updateCaretakerStatus("73578dfd-e7c9-4381-a348-113e72d80fa2");
-        Assertions.assertEquals(userCaretaker.getCaretakerId(),userCaretakerReal.getCaretakerId());
-        Assertions.assertEquals(userCaretaker.getPatientId(),userCaretakerReal.getPatientId());
-        Assertions.assertEquals(userCaretaker.getCaretakerId(),userCaretakerReal.getCaretakerId());
+        when(userCaretakerRepository.findById("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(Optional.of(userCaretaker));
+        when(userCaretakerRepository.save(userCaretaker)).thenReturn(userCaretaker);
+        CaretakerResponse caretakerResponseReal= careTakerServiceImpl.updateCaretakerStatus("73578dfd-e7c9-4381-a348-113e72d80fa2");
+        Assertions.assertEquals(userCaretaker.getCaretakerId(),caretakerResponseReal.getUserCaretaker().getCaretakerId());
+        Assertions.assertEquals(userCaretaker.getPatientId(),caretakerResponseReal.getUserCaretaker().getPatientId());
+        Assertions.assertEquals(userCaretaker.getCaretakerId(),caretakerResponseReal.getUserCaretaker().getCaretakerId());
     }
 
     @Test
@@ -120,14 +120,14 @@ class CareTakerServiceTest {
         when(userCaretakerRepository.getPatientsUnderMe("73578dfd-e7c9-4381-a348-113e72d80fa2",pageable)).thenReturn(userCaretakerPage);
         try{
             careTakerServiceImpl.getPatientsUnderMe("73578dfd-e7c9-4381-a348-113e72d80fa2",pageNo,pageSize);
-        }catch (UserCaretakerException userCaretakerException){
-            Assertions.assertEquals(Constants.DATA_NOT_FOUND,userCaretakerException.getMessage());
+        }catch (ResourceNotFoundException | UserCaretakerException e){
+            Assertions.assertEquals(Constants.PATIENTS_NOT_FOUND,e.getMessage());
         }
     }
 
 
     @Test
-    void getPateientsUnderMeTest() throws UserCaretakerException {
+    void getPatientsUnderMeTest() throws UserCaretakerException, ResourceNotFoundException {
         int pageNo=0;
         int pageSize = 2;
         Pageable pageable= PageRequest.of(pageNo,pageSize);
@@ -149,22 +149,22 @@ class CareTakerServiceTest {
         when(userCaretakerRepository.getPatientRequests("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(userCaretakerList);
         try{
             careTakerServiceImpl.getPatientRequests("73578dfd-e7c9-4381-a348-113e72d80fa2");
-        }catch (UserCaretakerException userCaretakerException){
-            Assertions.assertEquals(Constants.DATA_NOT_FOUND,userCaretakerException.getMessage());
+        }catch (UserCaretakerException | ResourceNotFoundException userCaretakerException){
+            Assertions.assertEquals(Constants.PATIENT_REQUEST_NOT_FOUND,userCaretakerException.getMessage());
         }
     }
 
     @Test
-    void getPatientRequestTest() throws UserCaretakerException {
+    void getPatientRequestTest() throws UserCaretakerException, ResourceNotFoundException {
         UserCaretaker userCaretaker = new UserCaretaker();
         List<UserCaretaker> userCaretakerList = new ArrayList<>();
         userCaretakerList.add(userCaretaker);
         when(userCaretakerRepository.getPatientRequests("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(userCaretakerList);
-        List<UserCaretaker> userCaretakerListReal = careTakerServiceImpl.getPatientRequests("73578dfd-e7c9-4381-a348-113e72d80fa2");
-        Assertions.assertEquals(userCaretakerList.size(),userCaretakerListReal.size());
-        Assertions.assertEquals(userCaretakerList.get(0).getCaretakerId(),userCaretakerListReal.get(0).getCaretakerId());
-        Assertions.assertEquals(userCaretakerList.get(0).getCaretakerUsername(),userCaretakerListReal.get(0).getCaretakerUsername());
-        Assertions.assertEquals(userCaretakerList.get(0).getPatientName(),userCaretakerListReal.get(0).getPatientName());
+        CaretakerListResponse caretakerListReal = careTakerServiceImpl.getPatientRequests("73578dfd-e7c9-4381-a348-113e72d80fa2");
+        Assertions.assertEquals(userCaretakerList.size(),caretakerListReal.getUserCaretakerList().size());
+        Assertions.assertEquals(userCaretakerList.get(0).getCaretakerId(),caretakerListReal.getUserCaretakerList().get(0).getCaretakerId());
+        Assertions.assertEquals(userCaretakerList.get(0).getCaretakerUsername(),caretakerListReal.getUserCaretakerList().get(0).getCaretakerUsername());
+        Assertions.assertEquals(userCaretakerList.get(0).getPatientName(),caretakerListReal.getUserCaretakerList().get(0).getPatientName());
     }
 
     @Test
@@ -173,22 +173,22 @@ class CareTakerServiceTest {
         when(userCaretakerRepository.getMyCaretakers("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(userCaretakerList);
         try{
             careTakerServiceImpl.getMyCaretakers("73578dfd-e7c9-4381-a348-113e72d80fa2");
-        }catch (UserCaretakerException userCaretakerException){
-            Assertions.assertEquals(Constants.DATA_NOT_FOUND,userCaretakerException.getMessage());
+        }catch (UserCaretakerException | ResourceNotFoundException userCaretakerException){
+            Assertions.assertEquals(Constants.CARETAKERS_NOT_FOUND,userCaretakerException.getMessage());
         }
     }
 
     @Test
-    void getMyCaretakersTest() throws UserCaretakerException {
+    void getMyCaretakersTest() throws UserCaretakerException, ResourceNotFoundException {
         UserCaretaker userCaretaker = new UserCaretaker();
         List<UserCaretaker> userCaretakerList = new ArrayList<>();
         userCaretakerList.add(userCaretaker);
         when(userCaretakerRepository.getMyCaretakers("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(userCaretakerList);
-        List<UserCaretaker> userCaretakerListReal = careTakerServiceImpl.getMyCaretakers("73578dfd-e7c9-4381-a348-113e72d80fa2");
-        Assertions.assertEquals(userCaretakerList.size(),userCaretakerListReal.size());
-        Assertions.assertEquals(userCaretakerList.get(0).getCaretakerId(),userCaretakerListReal.get(0).getCaretakerId());
-        Assertions.assertEquals(userCaretakerList.get(0).getCaretakerUsername(),userCaretakerListReal.get(0).getCaretakerUsername());
-        Assertions.assertEquals(userCaretakerList.get(0).getPatientName(),userCaretakerListReal.get(0).getPatientName());
+        CaretakerListResponse caretakerListReal = careTakerServiceImpl.getMyCaretakers("73578dfd-e7c9-4381-a348-113e72d80fa2");
+        Assertions.assertEquals(userCaretakerList.size(),caretakerListReal.getUserCaretakerList().size());
+        Assertions.assertEquals(userCaretakerList.get(0).getCaretakerId(),caretakerListReal.getUserCaretakerList().get(0).getCaretakerId());
+        Assertions.assertEquals(userCaretakerList.get(0).getCaretakerUsername(),caretakerListReal.getUserCaretakerList().get(0).getCaretakerUsername());
+        Assertions.assertEquals(userCaretakerList.get(0).getPatientName(),caretakerListReal.getUserCaretakerList().get(0).getPatientName());
     }
 
     @Test
@@ -198,7 +198,7 @@ class CareTakerServiceTest {
         try{
             careTakerServiceImpl.getCaretakerRequestStatus("73578dfd-e7c9-4381-a348-113e72d80fa2");
         }catch (UserCaretakerException userCaretakerException){
-            Assertions.assertEquals(Constants.NO_RECORD_FOUND,userCaretakerException.getMessage());
+            Assertions.assertEquals(Constants.REQUEST_NOT_FOUND,userCaretakerException.getMessage());
         }
     }
 
@@ -208,11 +208,11 @@ class CareTakerServiceTest {
         List<UserCaretaker> userCaretakerList = new ArrayList<>();
         userCaretakerList.add(userCaretaker);
         when(userCaretakerRepository.getCaretakerRequestStatus("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(userCaretakerList);
-        List<UserCaretaker> userCaretakerListReal = careTakerServiceImpl.getCaretakerRequestStatus("73578dfd-e7c9-4381-a348-113e72d80fa2");
-        Assertions.assertEquals(userCaretakerList.size(),userCaretakerListReal.size());
-        Assertions.assertEquals(userCaretakerList.get(0).getCaretakerId(),userCaretakerListReal.get(0).getCaretakerId());
-        Assertions.assertEquals(userCaretakerList.get(0).getCaretakerUsername(),userCaretakerListReal.get(0).getCaretakerUsername());
-        Assertions.assertEquals(userCaretakerList.get(0).getPatientName(),userCaretakerListReal.get(0).getPatientName());
+        List<UserCaretaker> caretakerListReal = careTakerServiceImpl.getCaretakerRequestStatus("73578dfd-e7c9-4381-a348-113e72d80fa2");
+        Assertions.assertEquals(userCaretakerList.size(),caretakerListReal.size());
+        Assertions.assertEquals(userCaretakerList.get(0).getCaretakerId(),caretakerListReal.get(0).getCaretakerId());
+        Assertions.assertEquals(userCaretakerList.get(0).getCaretakerUsername(),caretakerListReal.get(0).getCaretakerUsername());
+        Assertions.assertEquals(userCaretakerList.get(0).getPatientName(),caretakerListReal.get(0).getPatientName());
     }
 
     @Test
@@ -222,7 +222,7 @@ class CareTakerServiceTest {
         try{
             careTakerServiceImpl.getCaretakerRequests("73578dfd-e7c9-4381-a348-113e72d80fa2");
         }catch (UserCaretakerException userCaretakerException){
-            Assertions.assertEquals(Constants.DATA_NOT_FOUND,userCaretakerException.getMessage());
+            Assertions.assertEquals(Constants.REQUEST_NOT_FOUND,userCaretakerException.getMessage());
         }
     }
 
@@ -232,20 +232,20 @@ class CareTakerServiceTest {
         List<UserCaretaker> userCaretakerList = new ArrayList<>();
         userCaretakerList.add(userCaretaker);
         when(userCaretakerRepository.getCaretakerRequests("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(userCaretakerList);
-        List<UserCaretaker> userCaretakerListReal = careTakerServiceImpl.getCaretakerRequests("73578dfd-e7c9-4381-a348-113e72d80fa2");
-        Assertions.assertEquals(userCaretakerList.size(),userCaretakerListReal.size());
-        Assertions.assertEquals(userCaretakerList.get(0).getCaretakerId(),userCaretakerListReal.get(0).getCaretakerId());
-        Assertions.assertEquals(userCaretakerList.get(0).getCaretakerUsername(),userCaretakerListReal.get(0).getCaretakerUsername());
-        Assertions.assertEquals(userCaretakerList.get(0).getPatientName(),userCaretakerListReal.get(0).getPatientName());
+        CaretakerListResponse caretakerListReal = careTakerServiceImpl.getCaretakerRequests("73578dfd-e7c9-4381-a348-113e72d80fa2");
+        Assertions.assertEquals(userCaretakerList.size(),caretakerListReal.getUserCaretakerList().size());
+        Assertions.assertEquals(userCaretakerList.get(0).getCaretakerId(),caretakerListReal.getUserCaretakerList().get(0).getCaretakerId());
+        Assertions.assertEquals(userCaretakerList.get(0).getCaretakerUsername(),caretakerListReal.getUserCaretakerList().get(0).getCaretakerUsername());
+        Assertions.assertEquals(userCaretakerList.get(0).getPatientName(),caretakerListReal.getUserCaretakerList().get(0).getPatientName());
     }
 
     @Test
     void delPatientReqException() {
         Optional<UserCaretaker> userCaretaker= Optional.empty();
         when(userCaretakerRepository.findById("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(userCaretaker);
-        try{careTakerServiceImpl.delPatientReq("73578dfd-e7c9-4381-a348-113e72d80fa2");
-        }catch (UserCaretakerException | UserExceptionMessage userCaretakerException){
-            Assertions.assertEquals(Constants.NO_RECORD_FOUND,userCaretakerException.getMessage());
+        try{careTakerServiceImpl.deletePatientRequest("73578dfd-e7c9-4381-a348-113e72d80fa2");
+        }catch (UserCaretakerException e){
+            Assertions.assertEquals(Constants.REQUEST_NOT_FOUND,e.getMessage());
         }
     }
 
@@ -254,12 +254,12 @@ class CareTakerServiceTest {
         UserCaretaker userCaretaker= new UserCaretaker("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay",true,"ftdutsaduifioadf","yfuydfafakjfdafdou","nikunj",LocalDateTime.now(),"p",false);
         Optional<UserCaretaker> userCaretakerTest= Optional.of(userCaretaker);
         when(userCaretakerRepository.findById("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(userCaretakerTest);
-        String text =careTakerServiceImpl.delPatientReq("73578dfd-e7c9-4381-a348-113e72d80fa2");
-        Assertions.assertEquals(Constants.SUCCESS,text);
+        CaretakerDelete text =careTakerServiceImpl.deletePatientRequest("73578dfd-e7c9-4381-a348-113e72d80fa2");
+        Assertions.assertEquals(Constants.SUCCESS,text.getStatus());
     }
 
     @Test
-    void sendImageToCaretakerException() throws UserCaretakerException {
+    void sendImageToCaretakerException() {
         MockMultipartFile employeeJson = new MockMultipartFile("employee", null,
                 "application/json", "{\"name\": \"Emp Name\"}".getBytes());
         UserMedicines userMedicines= new UserMedicines();
@@ -269,8 +269,6 @@ class CareTakerServiceTest {
 
 
     }
-
-
 
     @Test
     void sendImageToCaretakerTest() throws UserCaretakerException{

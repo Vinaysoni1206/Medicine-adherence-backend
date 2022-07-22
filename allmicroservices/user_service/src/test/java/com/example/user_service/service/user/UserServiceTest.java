@@ -1,6 +1,7 @@
 package com.example.user_service.service.user;
 
 import com.example.user_service.config.PdfMailSender;
+import com.example.user_service.exception.ResourceNotFoundException;
 import com.example.user_service.exception.UserExceptionMessage;
 import com.example.user_service.exception.UserMedicineException;
 import com.example.user_service.model.MedicineHistory;
@@ -11,29 +12,29 @@ import com.example.user_service.pojos.request.UserDetailEntityDTO;
 import com.example.user_service.pojos.request.UserDTO;
 import com.example.user_service.pojos.request.UserMailDTO;
 import com.example.user_service.pojos.request.UserMedicineDTO;
-import com.example.user_service.pojos.response.UserDetailResponsePage;
-import com.example.user_service.pojos.response.UserResponse;
+import com.example.user_service.pojos.response.*;
 import com.example.user_service.repository.UserDetailsRepository;
 import com.example.user_service.repository.UserMedicineRepository;
 import com.example.user_service.repository.UserRepository;
-import com.example.user_service.service.UserServiceImpl;
+import com.example.user_service.service.impl.UserServiceImpl;
 import com.example.user_service.util.JwtUtil;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import io.jsonwebtoken.ExpiredJwtException;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.mock.web.MockHttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -41,6 +42,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+import static com.example.user_service.util.Constants.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
@@ -63,19 +66,35 @@ class UserServiceTest {
     private PdfMailSender pdfMailSender;
     @Mock
     private JwtUtil jwtUtil;
+    @Mock
+    RabbitTemplate rabbitTemplate;
     @BeforeEach
     public void initcase() {
-        userServiceImpl= new UserServiceImpl(userRepository,jwtUtil,userDetailsRepository,mapper,pdfMailSender,userMedicineRepository);
+        userServiceImpl= new UserServiceImpl(userRepository,userDetailsRepository,mapper,pdfMailSender,userMedicineRepository,jwtUtil,rabbitTemplate);
     }
 
+    UserDetails userDetails= new UserDetails();
+    User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),userDetails,null);
+    UserResponse userResponse= new UserResponse("Failed","User is already present",new ArrayList<>(Arrays.asList(user)),null,null);
+    UserDTO userDTO = new UserDTO("vinay","vinay@gmail.com");
+    UserDetailEntityDTO userEntity = new UserDetailEntityDTO("vinay","vinay@gmail.com","something",21,8721L,"Male","AB+","UnMarried",60);
+    UserDetailEntityDTO userEntity1 = new UserDetailEntityDTO("yatin","vinay@gmail.com","something",21,8721L,"Male","AB+","UnMarried",60);
+    UserDetailEntityDTO userEntity2 = new UserDetailEntityDTO("nikunj","vinay@gmail.com","something",21,8721L,"Male","AB+","UnMarried",60);
+    List<UserDetailEntityDTO> users = new ArrayList<>();
+    List<User> userEntities = new ArrayList<>();
+
+    int pageSize = 4;
+    int pageNo = 0;
+    Pageable paging = PageRequest.of(pageNo,pageSize);
+    MedicineHistory medicineHistory = new MedicineHistory(123,"2022-04-16T16:05:20.961Z","10:00 AM","8:00 PM",null);
+    List<MedicineHistory> medicineHistoryList= new ArrayList<>();
+    Optional<UserMedicines> userMedicines= Optional.of(new UserMedicines(12345, "2022-04-16T16:05:20.961Z", "PCM", "for headache", "Mon", "2022-04-16T16:05:20.961Z", "10:00 AM", "10 AM", 12, 12, user, medicineHistoryList, null));
+
+    String fcmToken = "";
     @Test
     @DisplayName("Test for saving user successfully")
-    void saveUserTest() throws UserExceptionMessage{
-
-        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
-        UserResponse userResponse= new UserResponse("Failed","User is already present",new ArrayList<>(Arrays.asList(user)),null,null);
+    void saveUserTest() throws UserExceptionMessage, ResourceNotFoundException {
         when(userServiceImpl.getUserByEmail(user.getEmail())).thenReturn(null);
-        UserDTO userDTO = new UserDTO("vinay","vinay@gmail.com");
         when(mapper.map(userDTO, User.class)).thenReturn(user);
         when(jwtUtil.generateToken(user.getUserId())).thenReturn("fiasfiugaojfbjkabfk");
         when(jwtUtil.generateRefreshToken(user.getUserId())).thenReturn("ujagfgouiaetfiugljgb");
@@ -89,11 +108,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Test for saving user while user exists")
-    void saveUserTestUserExist() throws UserExceptionMessage{
-
-        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
-        UserResponse userResponse= new UserResponse("Failed","User is already present",new ArrayList<>(Arrays.asList(user)),null,null);
-        UserDTO userDTO = new UserDTO("vinay","vinay@gmail.com");
+    void saveUserTestUserExist() throws UserExceptionMessage, ResourceNotFoundException {
         when(userServiceImpl.getUserByEmail(user.getEmail())).thenReturn(user);
         UserResponse userResponse1= userServiceImpl.saveUser(userDTO,"eafyigfiagf","sfhoshgouahgo");
         Assertions.assertEquals(userResponse.getUser().get(0).getUserName(),userResponse1.getUser().get(0).getUserName());
@@ -104,16 +119,15 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Test for saving user exception")
-    void saveUserInnerExcpetion(){
-        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2",null,"vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
-        UserDTO userDTO = new UserDTO("vinay","vinay@gmail.com");
+    void saveUserInnerException() throws UserExceptionMessage {
+        user.setUserName(null);
         when(userServiceImpl.getUserByEmail(any())).thenReturn(null);
         when(mapper.map(userDTO, User.class)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(user);
         try{
             userServiceImpl.saveUser(userDTO,"eafyigfiagf","sfhoshgouahgo");
-        }catch(UserExceptionMessage userExceptionMessage){
-            Assertions.assertEquals("Error try again!",userExceptionMessage.getMessage());
+        }catch(ResourceNotFoundException message){
+            Assertions.assertEquals(USER_NOT_SAVED,message.getMessage());
         }
     }
 
@@ -121,16 +135,9 @@ class UserServiceTest {
     @Test
     @DisplayName("Test for getting users list successfully")
     void getUsersTest() throws Exception{
-        UserDetailEntityDTO userEntity = new UserDetailEntityDTO("vinay","vinay@gmail.com","something",21,null,"Male","AB+","UnMarried",60);
-        UserDetailEntityDTO userEntity1 = new UserDetailEntityDTO("yatin","vinay@gmail.com","something",21,null,"Male","AB+","UnMarried",60);
-        UserDetailEntityDTO userEntity2 = new UserDetailEntityDTO("nikunj","vinay@gmail.com","something",21,null,"Male","AB+","UnMarried",60);
-        List<UserDetailEntityDTO> users = new ArrayList<>();
         users.add(userEntity);
         users.add(userEntity1);
         users.add(userEntity2);
-        int pageSize = 4;
-        int pageNo = 0;
-        Pageable paging = PageRequest.of(pageNo,pageSize);
         Page<UserDetailEntityDTO> userEntityPage= new PageImpl<>(users);
         when(userRepository.findAllUsers(paging)).thenReturn(userEntityPage);
         CompletableFuture<UserDetailResponsePage> userResponsePage1=userServiceImpl.getUsers(0,4);
@@ -145,22 +152,17 @@ class UserServiceTest {
     @Test
     @DisplayName("Test for getting users failed")
     void getUsersTestException(){
-        List<UserDetailEntityDTO> users = new ArrayList<>();
-        int pageSize = 4;
-        int pageNo = 0;
-        Pageable paging = PageRequest.of(pageNo,pageSize);
         Page<UserDetailEntityDTO> userEntityPage= new PageImpl<>(users);
         when(userRepository.findAllUsers(paging)).thenReturn(userEntityPage);
         try{
-            CompletableFuture<UserDetailResponsePage> userResponsePage1=userServiceImpl.getUsers(0,4);
-        }catch (UserExceptionMessage userExceptionMessage){
-            Assertions.assertEquals("Data not found",userExceptionMessage.getMessage());
+            userServiceImpl.getUsers(0,4);
+        }catch (ResourceNotFoundException userExceptionMessage){
+            Assertions.assertEquals(NO_USERS_FOUND,userExceptionMessage.getMessage());
         }
     }
 
     @Test
-    void getUserByIdTest() throws UserExceptionMessage{
-        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
+    void getUserByIdTest() throws  ResourceNotFoundException {
         when(userRepository.getUserById("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(user);
         User user1 = userServiceImpl.getUserById("73578dfd-e7c9-4381-a348-113e72d80fa2");
         Assertions.assertEquals(user.getUserId(), user1.getUserId());
@@ -172,39 +174,32 @@ class UserServiceTest {
     void getUserByIdTestException(){
         when(userRepository.getUserById("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(null);
         try{
-            User user1 = userServiceImpl.getUserById("73578dfd-e7c9-4381-a348-113e72d80fa2");
-        } catch (UserExceptionMessage userExceptionMessage){
-            Assertions.assertEquals("Data not found",userExceptionMessage.getMessage());
+            userServiceImpl.getUserById("73578dfd-e7c9-4381-a348-113e72d80fa2");
+        } catch (ResourceNotFoundException userExceptionMessage){
+            Assertions.assertEquals(USER_ID_NOT_FOUND,userExceptionMessage.getMessage());
         }
     }
 
     @Test
-    void getUserById1Test() throws UserExceptionMessage {
-        UserDetailEntityDTO userDetailEntityDTO= new UserDetailEntityDTO("Vinay","vinay@gmail.com","nothing",21,null,"male","AB+","Unmarried",60);
-        when(userRepository.getUserById1("a6bf0fef-01fd-465c-a901-a3b98f5c88b4")).thenReturn(userDetailEntityDTO);
-        UserDetailEntityDTO userDetailEntityDTO1= userServiceImpl.getUserById1("a6bf0fef-01fd-465c-a901-a3b98f5c88b4");
-        Assertions.assertEquals(userDetailEntityDTO.getUserName(),userDetailEntityDTO1.getUserName());
-        Assertions.assertEquals(userDetailEntityDTO.getAge(),userDetailEntityDTO1.getAge());
-        Assertions.assertEquals(userDetailEntityDTO.getGender(),userDetailEntityDTO1.getGender());
-        Assertions.assertEquals(userDetailEntityDTO.getBio(),userDetailEntityDTO1.getBio());
-        Assertions.assertEquals(userDetailEntityDTO.getEmail(),userDetailEntityDTO1.getEmail());
+    void getUserByIdCustomTest() throws UserExceptionMessage, ResourceNotFoundException {
+        when(userRepository.getUserByIdCustom("a6bf0fef-01fd-465c-a901-a3b98f5c88b4")).thenReturn(userEntity);
+        UserProfileResponse userProfileResponse= userServiceImpl.getUserByIdCustom("a6bf0fef-01fd-465c-a901-a3b98f5c88b4");
+        Assertions.assertEquals(userEntity.getUserName(),userProfileResponse.getUser().getUserName());
     }
 
     @Test
     void getUserById1ExceptionTest(){
         UserDetailEntityDTO userEntity= null;
-        when(userRepository.getUserById1("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(userEntity);
+        when(userRepository.getUserByIdCustom("73578dfd-e7c9-4381-a348-113e72d80fa2")).thenReturn(userEntity);
         try{
-            UserDetailEntityDTO userEntity1 = userServiceImpl.getUserById1("73578dfd-e7c9-4381-a348-113e72d80fa2");
-        } catch (UserExceptionMessage userExceptionMessage){
-            Assertions.assertEquals("Data not found",userExceptionMessage.getMessage());
+            userServiceImpl.getUserByIdCustom("73578dfd-e7c9-4381-a348-113e72d80fa2");
+        } catch (UserExceptionMessage | ResourceNotFoundException userExceptionMessage){
+            Assertions.assertEquals(USER_ID_NOT_FOUND,userExceptionMessage.getMessage());
         }
     }
 
     @Test
-    void getUserByNameTest() throws UserExceptionMessage {
-        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
-        List<User> userEntities = new ArrayList<>();
+    void getUserByNameTest() throws UserExceptionMessage, ResourceNotFoundException {
         userEntities.add(user);
         when(userRepository.findByNameIgnoreCase(user.getUserName())).thenReturn(userEntities);
         List<User> userEntities1 = userServiceImpl.getUserByName(user.getUserName());
@@ -215,83 +210,75 @@ class UserServiceTest {
 
     @Test
     void getUserByNameTestException() {
-        List<User> userEntities = new ArrayList<>();
         when(userRepository.findByNameIgnoreCase(any())).thenReturn(userEntities);
         try {
             List<User> userEntities1 = userServiceImpl.getUserByName("vinay");
-        }catch (UserExceptionMessage userExceptionMessage){
-            Assertions.assertEquals("Data not found",userExceptionMessage.getMessage());
+        }catch (ResourceNotFoundException userExceptionMessage){
+            Assertions.assertEquals(USER_NAME_NOT_FOUND,userExceptionMessage.getMessage());
         }
     }
 
     @Test
-    void getUserByEmail1Test() throws UserExceptionMessage {
-        UserMailDTO userMailDTO= new UserMailDTO("Vinay","vinay@gmail.com",null);
-        when(userRepository.findByMail1("vinay@gmail.com")).thenReturn(userMailDTO);
-        UserMailDTO userMailDTO1= userServiceImpl.getUserByEmail1("vinay@gmail.com");
-        Assertions.assertEquals(userMailDTO.getUserName(),userMailDTO1.getUserName());
-        Assertions.assertEquals(userMailDTO.getEmail(),userMailDTO1.getEmail());
-        Assertions.assertEquals(userMailDTO.getPicPath(),userMailDTO1.getPicPath());
+    void getUserByEmailCustomUserNotPresentTest(){
+        user.setUserName(null);
+        when(userRepository.findByMail("vinay@gmail.com")).thenReturn(user);
+        UserMailResponse userMailResponse = new UserMailResponse(DATA_NOT_FOUND,"Invitation sent to user with given email id!",null);
+        UserMailResponse userMailResponseReal= userServiceImpl.getUserByEmailCustom("vinay@gmail.com",anyString());
+        Assertions.assertEquals(userMailResponse.getStatus(),userMailResponseReal.getStatus());
+        Assertions.assertEquals(userMailResponse.getMessage(),userMailResponseReal.getMessage());
+
     }
 
     @Test
-    void getUserByEmail1ExceptionTest() {
-        UserMailDTO userMailDTO= new UserMailDTO(null,"vinay@gmail.com",null);
-        when(userRepository.findByMail1("vinay@gmail.com")).thenReturn(userMailDTO);
-        try{
-            UserMailDTO userMailDTO1= userServiceImpl.getUserByEmail1("vinay@gmail.com");
-        }catch (UserExceptionMessage userExceptionMessage){
-            Assertions.assertEquals("Data not found",userExceptionMessage.getMessage());
-        }
-
+    void getUserByEmailCustomTest(){
+        when(userRepository.findByMail("vinay@gmail.com")).thenReturn(user);
+        UserMailResponse userMailResponse= userServiceImpl.getUserByEmailCustom("vinay@gmail.com",anyString());
+        Assertions.assertEquals(user.getUserId(),userMailResponse.getUser().getUserId());
     }
+
 
     @Test
     void getUserByEmail() throws UserExceptionMessage {
-        User userEntity = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
-        when(userRepository.findByMail("vinay@gmail.com")).thenReturn(userEntity);
+        when(userRepository.findByMail("vinay@gmail.com")).thenReturn(user);
         User user = userServiceImpl.getUserByEmail(userEntity.getEmail());
-        Assertions.assertEquals(userEntity.getUserId(),user.getUserId());
-        Assertions.assertEquals(userEntity.getEmail(),user.getEmail());
-        Assertions.assertEquals(userEntity.getUserName(),user.getUserName());
+        Assertions.assertEquals(user.getUserId(),user.getUserId());
+        Assertions.assertEquals(user.getEmail(),user.getEmail());
+        Assertions.assertEquals(user.getUserName(),user.getUserName());
     }
 
     @Test
-    void sendUserMedicinesTest() throws UserExceptionMessage, FileNotFoundException {
-        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
-        MedicineHistory medicineHistory = new MedicineHistory(123,"2022-04-16T16:05:20.961Z","10:00 AM","8:00 PM",null);
-        List<MedicineHistory> medicineHistoryList= new ArrayList<>();
+    void getUserByEmailExceptionTest() {
+        user.setUserId(null);
+        when(userRepository.findByMail("vinay@gmail.com")).thenReturn(user);
+        userServiceImpl.getUserByEmail("vinay@gmail.com");
+    }
+
+    @Test
+    void sendUserMedicinesTest() throws  FileNotFoundException, ResourceNotFoundException {
         medicineHistoryList.add(medicineHistory);
-        Optional<UserMedicines> userMedicines= Optional.of(new UserMedicines(12345, "2022-04-16T16:05:20.961Z", "PCM", "for headache", "Mon", "2022-04-16T16:05:20.961Z", "10:00 AM", "10 AM", 12, 12, user, medicineHistoryList, null));
         when(userMedicineRepository.findById(12345)).thenReturn(userMedicines);
         User entity= userMedicines.get().getUser();
         List<MedicineHistory> medicinesList= userMedicines.get().getMedicineHistories();
         String text= pdfMailSender.send(entity,userMedicines.get(),medicinesList);
-        String text1= userServiceImpl.sendUserMedicines(12345);
-        Assertions.assertEquals(text,text1);
+        UserResponse userResponseReal= userServiceImpl.sendUserMedicines(12345);
+        Assertions.assertEquals(text,userResponseReal.getMessage());
     }
 
     @Test
     void sendUserMedicinesExceptionTest() throws FileNotFoundException {
-        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","vinay","vinay@gmail.com", LocalDateTime.now(), LocalDateTime.now(),null,null);
-        MedicineHistory medicineHistory = new MedicineHistory(123,"2022-04-16T16:05:20.961Z","10:00 AM","8:00 PM",null);
-        List<MedicineHistory> medicineHistoryList= new ArrayList<>();
         medicineHistoryList.add(medicineHistory);
         Optional<UserMedicines> userMedicines= Optional.empty();
         when(userMedicineRepository.findById(12345)).thenReturn(userMedicines);
         try {
             userServiceImpl.sendUserMedicines(12345);
-        }catch (UserExceptionMessage e) {
-            Assertions.assertEquals("Medicine not found",e.getMessage());
+        }catch (ResourceNotFoundException e) {
+            Assertions.assertEquals(MEDICINES_NOT_FOUND,e.getMessage());
         }
     }
 
 
     @Test
-    void loginTest() throws UserExceptionMessage {
-        String fcmToken = "";
-        UserDetails userDetails= new UserDetails();
-        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2","Nikunj123","nikunj123@gmail.com", LocalDateTime.now(), LocalDateTime.now(),userDetails,null);
+    void loginTest() throws UserExceptionMessage, ResourceNotFoundException {
         when(userServiceImpl.getUserByEmail(any())).thenReturn(user);
         userDetails.setFcmToken("afyuauvfiualfviuaofga");
         when(userDetailsRepository.save(userDetails)).thenReturn(userDetails);
@@ -306,19 +293,15 @@ class UserServiceTest {
     }
 
     @Test
-    void loginExceptionTest(){
-        String fcmToken = "";
-        UserDetails userDetails= new UserDetails();
-        User user = new User("73578dfd-e7c9-4381-a348-113e72d80fa2",null,"nikunj123@gmail.com", LocalDateTime.now(), LocalDateTime.now(),userDetails,null);
+    void loginExceptionTest() {
+        user.setUserName(null);
         when(userServiceImpl.getUserByEmail(any())).thenReturn(user);
         userDetails.setFcmToken("afyuauvfiualfviuaofga");
         when(userDetailsRepository.save(userDetails)).thenReturn(userDetails);
-        String jwtToken= jwtUtil.generateToken(user.getUserName());
-        String refreshToken = jwtUtil.generateRefreshToken(user.getUserId());
         try{
             userServiceImpl.login(user.getEmail(), user.getUserDetails().getFcmToken());
-        }catch (UserExceptionMessage userExceptionMessage){
-            Assertions.assertEquals("Data not found",userExceptionMessage.getMessage());
+        }catch (UserExceptionMessage | ResourceNotFoundException userExceptionMessage){
+            Assertions.assertEquals(USER_NOT_FOUND,userExceptionMessage.getMessage());
         }
     }
 
@@ -330,7 +313,7 @@ class UserServiceTest {
         when(userRepository.getUserMedicineById("a6bf0fef-01fd-465c-a901-a3b98f5c88b4")).thenReturn(medicineDTOList);
         List<UserMedicineDTO> userMedicineDTOS = userServiceImpl.getUserMedicineById("a6bf0fef-01fd-465c-a901-a3b98f5c88b4");
         Assertions.assertEquals(medicineDTOList.get(0).getMedicineName(),userMedicineDTOS.get(0).getMedicineName());
-        Assertions.assertEquals(medicineDTOList.get(0).getMedicineDes(),userMedicineDTOS.get(0).getMedicineDes());
+        Assertions.assertEquals(medicineDTOList.get(0).getMedicineDescription(),userMedicineDTOS.get(0).getMedicineDescription());
         Assertions.assertEquals(medicineDTOList.get(0).getDays(),userMedicineDTOS.get(0).getDays());
         Assertions.assertEquals(medicineDTOList.get(0).getEndDate(),userMedicineDTOS.get(0).getEndDate());
         Assertions.assertEquals(medicineDTOList.get(0).getStartDate(),userMedicineDTOS.get(0).getStartDate());
@@ -338,20 +321,70 @@ class UserServiceTest {
     }
 
     @Test
-    void getUserMedicinesByIdExceptionTest() throws UserExceptionMessage, UserMedicineException, ExecutionException, InterruptedException {
-        UserMedicineDTO userMedicineDTO= null;
-        List<UserMedicineDTO> medicineDTOList = new ArrayList<>();
+    void getUserMedicinesByIdExceptionTest(){
         when(userRepository.getUserMedicineById("a6bf0fef-01fd-465c-a901-a3b98f5c88b4")).thenReturn(null);
         try {
             userServiceImpl.getUserMedicineById("a6bf0fef-01fd-465c-a901-a3b98f5c88b4");
         }catch (UserExceptionMessage userExceptionMessage)
-        {Assertions.assertEquals("Data not found",userExceptionMessage.getMessage());
+        {Assertions.assertEquals(NO_MEDICINE_PRESENT,userExceptionMessage.getMessage());
         }
     }
 
+    @Test
+    void getRefreshTokenTest() throws UserExceptionMessage, ResourceNotFoundException {
+        HttpServletRequest httpServletRequest= Mockito.mock(HttpServletRequest.class);
+        when(httpServletRequest.getHeader("Authorization")).thenReturn("Bearer header");
+        when(userRepository.getUserById("a6bf0fef-01fd-465c-a901-a3b98f5c88b4")).thenReturn(user);
+        when(jwtUtil.validateToken("header",null)).thenReturn(true);
+        when(jwtUtil.extractUsername("header")).thenReturn("vinay");
+        when(jwtUtil.generateToken("vinay")).thenReturn("some value");
+        RefreshTokenResponse response= new RefreshTokenResponse(SUCCESS,"some value","something");
+        RefreshTokenResponse responseReal = userServiceImpl.getRefreshToken(httpServletRequest,"a6bf0fef-01fd-465c-a901-a3b98f5c88b4");
+        Assertions.assertEquals(response.getStatus(),responseReal.getStatus());
+    }
 
+    @Test
+    void getRefreshTokenTestExpiredRefreshToken() throws UserExceptionMessage, ResourceNotFoundException {
+        HttpServletRequest httpServletRequest= Mockito.mock(HttpServletRequest.class);
+        when(httpServletRequest.getHeader("Authorization")).thenReturn("Bearer header");
+        when(userRepository.getUserById("a6bf0fef-01fd-465c-a901-a3b98f5c88b4")).thenReturn(user);
+        when(jwtUtil.validateToken("header",null)).thenReturn(false);
+        when(jwtUtil.generateToken("vinay")).thenReturn("some value");
+        when(jwtUtil.generateRefreshToken("vinay")).thenReturn("some value");
+        RefreshTokenResponse response= new RefreshTokenResponse(SUCCESS,"some value","some value");
+        RefreshTokenResponse responseReal = userServiceImpl.getRefreshToken(httpServletRequest,"a6bf0fef-01fd-465c-a901-a3b98f5c88b4");
+        Assertions.assertEquals(response.getStatus(),responseReal.getStatus());
+    }
 
+    @Test
+    void getRefreshTokenTestException() throws UserExceptionMessage, ResourceNotFoundException {
+        HttpServletRequest httpServletRequest= Mockito.mock(HttpServletRequest.class);
+        when(httpServletRequest.getHeader("Authorization")).thenReturn(null);
+        when(userRepository.getUserById("a6bf0fef-01fd-465c-a901-a3b98f5c88b4")).thenReturn(user);
+        try {
+            userServiceImpl.getRefreshToken(httpServletRequest, "a6bf0fef-01fd-465c-a901-a3b98f5c88b4");
+        }catch (UserExceptionMessage message){
+            Assertions.assertEquals(INVALID_REFRESH_TOKEN, message.getMessage());
+        }
+    }
 
+    @Test
+    void getRefreshTokenTestExceptionOne() throws ResourceNotFoundException {
+        HttpServletRequest httpServletRequest= Mockito.mock(HttpServletRequest.class);
+        when(httpServletRequest.getHeader("Authorization")).thenReturn("Beare header");
+        when(userRepository.getUserById("a6bf0fef-01fd-465c-a901-a3b98f5c88b4")).thenReturn(user);
+        try {
+            userServiceImpl.getRefreshToken(httpServletRequest, "a6bf0fef-01fd-465c-a901-a3b98f5c88b4");
+        }catch (UserExceptionMessage message){
+            Assertions.assertEquals(INVALID_REFRESH_TOKEN, message.getMessage());
+        }
+    }
 
+    @Test
+    void checkRefreshTokenTest(){
+        when(jwtUtil.validateToken("something",null)).thenThrow(ExpiredJwtException.class);
+        userServiceImpl.checkRefreshToken("something");
+
+    }
 
 }

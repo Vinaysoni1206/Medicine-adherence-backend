@@ -24,7 +24,7 @@
 			**/com/example/user_service/batch/*,
 			**/com/example/user_service/config/*,
 			**/com/example/user_service/config/filter/*,
-			**/com/example/user_service/model/user/*,
+			**/com/example/user_service/model/*,
 			**/com/example/user_service/pojos/**,
 			**/com/example/user_service/repository/*,
 			**/com/example/user_service/security/SecurityLayer.java,
@@ -33,6 +33,7 @@
 			**/com/example/user_service/util/Datehelper.java,
 			**/com/example/user_service/util/Constants.java,
 			**/com/example/user_service/validators/*,
+			**/com/example/user_service/annotations/*,
 			**/com/example/user_service/UserServiceApplication.java
 		</sonar.coverage.exclusions>
 	</properties>
