@@ -1,6 +1,5 @@
 package com.example.user_service.pojos.request;
 
-import com.example.user_service.annotations.Email;
 import com.example.user_service.annotations.EmptyNotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;

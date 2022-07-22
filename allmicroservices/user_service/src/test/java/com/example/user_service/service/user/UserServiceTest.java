@@ -383,7 +383,8 @@ class UserServiceTest {
     @Test
     void checkRefreshTokenTest(){
         when(jwtUtil.validateToken("something",null)).thenThrow(ExpiredJwtException.class);
-        userServiceImpl.checkRefreshToken("something");
+        Boolean value = userServiceImpl.checkRefreshToken("something");
+        Assertions.assertEquals(false,value);
 
     }
 

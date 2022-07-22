@@ -4,7 +4,6 @@ package com.example.user_service.controller;
 
 import com.example.user_service.exception.ResourceNotFoundException;
 import com.example.user_service.exception.UserExceptionMessage;
-import com.example.user_service.model.UserDetails;
 import com.example.user_service.pojos.request.UserDetailsDTO;
 import com.example.user_service.pojos.response.UserDetailResponse;
 import com.example.user_service.service.UserDetailService;

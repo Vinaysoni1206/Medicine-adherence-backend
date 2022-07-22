@@ -20,7 +20,7 @@ public class JwtUtil {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
 //    @Value("${project.jwt.secretkey}")
-    private static final String secretKey="medicineadherencesecretkey";
+    private static final String secretKey="medicineadherencesecretkey"; //NO SONAR
 
     @Value("${project.jwt.jwtExpirationMs}")
     private int jwtExpirationMs;
